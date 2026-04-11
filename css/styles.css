@@ -30,6 +30,21 @@ section{
     padding: 2rem 9%  ;
 }
 
+.btn{
+    display: inline-block;
+    margin-top: 1rem;
+    border-radius: 5rem;
+    background: var(--negro);
+    color: #fff;
+    padding: .9rem 3.5rem;
+    cursor: pointer;
+    font-size: 1.7rem;
+}
+
+.btn:hover{
+    background:var(--amarillo);
+}
+
 header{
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -86,11 +101,40 @@ header .fa-bars{
     border: .1rem solid rgba(0,0,0,.3);
 }
 
+.home{
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url("../images/FONDO_HOME.jpeg");
+    background-size: cover;
+    background-position: center;
+}
 
+.home .content{
+    max-width: 50rem;
+}
 
+.home .content h3{
+    font-size: 6rem;
+    color: var(--celeste);
+    /* text-shadow: 2px 2px 5px rgba(0,0,0,0.3); */
+}
 
+.home .content span{
+    font-size: 3.5rem;
+    color: var(--amarillo);
+    padding: 1rem 0;
+    line-height: 1.5;
+    /* text-shadow: 2px 2px 5px rgba(0,0,0,0.3); */
+}
 
-
+.home .content p{
+    font-size: 1.5rem;
+    color: var(--celeste);
+    padding: 1rem 0;
+    line-height: 1.5;
+    /* text-shadow: 2px 2px 5px rgba(0,0,0,0.3); */
+}
 
 /* adaptabilidad responsiva */
 @media(max-width:991px){
@@ -100,6 +144,14 @@ header .fa-bars{
 
     header{
         padding: 2rem;
+    }
+
+    section{
+        padding: 2rem;
+    }
+
+    .home{
+        background-position: left;
     }
 }
 
@@ -131,6 +183,14 @@ header .fa-bars{
 
     header .fa-bars:hover{
         color:var(--amarillo)
+    }
+
+    .home .content h3{
+        font-size: 5rem;
+    }
+
+        .home .content span{
+        font-size: 2.5rem;
     }
 }
 
