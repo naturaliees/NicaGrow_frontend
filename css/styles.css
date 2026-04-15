@@ -67,6 +67,12 @@ header .logo{
     font-weight: bolder;
 }
 
+/* header .logoimg{
+    background-image: url(../images/NicaGrowLogo.png);
+    background-size: cover;
+    background-position: left;
+} */
+
 header .navbar a{
     font-size: 2rem;
     padding: 0 1.5rem;
@@ -121,7 +127,6 @@ header .fa-bars{
 .home .content h3{
     font-size: 6rem;
     color: var(--celeste);
-    /* text-shadow: 2px 2px 5px rgba(0,0,0,0.3); */
 }
 
 .home .content span{
@@ -129,7 +134,6 @@ header .fa-bars{
     color: var(--amarillo);
     padding: 1rem 0;
     line-height: 1.5;
-    /* text-shadow: 2px 2px 5px rgba(0,0,0,0.3); */
 }
 
 .home .content p{
@@ -137,7 +141,70 @@ header .fa-bars{
     color: var(--celeste);
     padding: 1rem 0;
     line-height: 1.5;
-    /* text-shadow: 2px 2px 5px rgba(0,0,0,0.3); */
+}
+
+.about {
+    padding: 60px 9%;
+}
+
+.titulo-about {
+    text-align: center;
+    font-size: 5rem;
+    margin-bottom: 40px;
+    font-family: "Manrope", sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.about-container {
+    padding: 20px 30px;
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.about-left {
+    flex: 2;
+}
+
+.about-left p {
+    font-size: 1.5rem;
+    color: #333;
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+.about-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.about-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.about-item i {
+    font-size: 2.2rem;
+    color: var(--azul);
+    margin-top: 5px;
+}
+
+.about-item h4 {
+    font-size: 1.6rem;
+    margin-bottom: 5px;
+    color: var(--negro);
+}
+
+.about-item p {
+    font-size: 1.3rem;
+    color: #555;
 }
 
 .services {
@@ -162,11 +229,12 @@ header .fa-bars{
 }
 
 .serv span{
-    background: #4a52eb;
-    color:#fff;
-    padding: 5px 15px;
-    border-radius: 30px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    font-size: 4rem;
+    margin-bottom: 40px;
+    font-family: "Manrope", sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 .card {
@@ -197,6 +265,89 @@ header .fa-bars{
   font-size: 1.2rem;
   color: #555;
 }
+
+
+.contact {
+    padding: 20px 9%;
+    background: #fff;
+}
+
+.titulo-contacto {
+    text-align: center;
+    font-size: 4rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+    font-family: "Manrope", sans-serif;
+}
+
+.contact-container {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.contact-form {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 1.4rem;
+}
+
+.contact-form textarea {
+    min-height: 120px;
+    resize: none;
+}
+
+.contact-form button {
+    background: var(--azul);
+    color: #fff;
+    padding: 12px;
+    border-radius: 30px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.contact-form button:hover {
+    background: var(--negro);
+}
+
+/* INFO */
+.contact-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.info-item i {
+    font-size: 2rem;
+    color: var(--azul);
+}
+
+.info-item p {
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.footer{
+    padding: 20px;
+    font-size: 15px;
+}
+
 
 /* adaptabilidad responsiva */
 @media(max-width:991px){
@@ -259,5 +410,21 @@ header .fa-bars{
 @media(max-width:450px){
     html{
         font-size: 50%;
+    }
+}
+
+@media(max-width: 991px){
+    .about-container {
+        flex-direction: column;
+    }
+
+    .titulo-about {
+        font-size: 3rem;
+    }
+}
+
+@media(max-width:991px){
+    .contact-container {
+        flex-direction: column;
     }
 }
