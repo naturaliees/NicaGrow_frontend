@@ -1,11 +1,13 @@
 :root{
 
+    /*variables base para reutilizar colores en todo el sitio*/
     --azul:#4a52eb;
     --celeste:#e8e9fc;
     --amarillo:#d1f577;
     --negro:#19191d;
 }
 
+/*reset general para normalizar margenes, cajas y tipografia */
 *{
     margin:0; padding:0;
     box-sizing: border-box;
@@ -15,7 +17,7 @@
     font-style: normal;
     outline: none; border:none;
     text-decoration: none;
-    text-transform: capitalize;
+    text-transform: none;
     transition: .2s linear;
 }
 
@@ -23,6 +25,7 @@ body{
     background: #dadcf7;
 }
 
+/*base del documento*/
 html{
     font-size: 62.5%;
     scroll-behavior: smooth;
@@ -34,6 +37,7 @@ section{
     padding: 2rem 9%  ;
 }
 
+/*boton reutilizable para acciones principales*/
 .btn{
     display: inline-block;
     margin-top: 1rem;
@@ -49,6 +53,7 @@ section{
     background:var(--amarillo);
 }
 
+/*encabezado fijo para dejar siempre visible la navegacion*/
 header{
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -65,18 +70,15 @@ header .logo{
     font-size: 3rem;
     color: #333;
     font-weight: bolder;
-}
+    text-decoration: none !important;
 
-/* header .logoimg{
-    background-image: url(../images/NicaGrowLogo.png);
-    background-size: cover;
-    background-position: left;
-} */
+}
 
 header .navbar a{
     font-size: 2rem;
     padding: 0 1.5rem;
-    color:#666;
+    color:#666;    
+    text-decoration: none !important;   
 }
 
 header .navbar a:hover{
@@ -111,6 +113,98 @@ header .fa-bars{
     border: .1rem solid rgba(0,0,0,.3);
 }
 
+/*contenedor*/
+.user-menu{
+    position: relative;
+}
+
+/*ocultar checkbox*/
+#user-toggle{
+    display: none;
+}
+
+/*icono clickable*/
+.user-menu label{
+    display: inline-block;
+    color:var(--negro);
+    padding: .9rem 3.5rem;
+    cursor: pointer;
+    font-size: 1.7rem;
+}
+
+.user-menu label:hover{
+    color:var(--amarillo)
+}
+
+/*menu emergente del perfil que se posiciona sobre el header (en el icono de persona)*/
+/*menú oculto por default*/
+.user-menu .menu{
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 10px;
+    display: none;
+    z-index: 9999;
+}
+
+/*mostrar menú cuando se activa*/
+#user-toggle:checked ~ .menu{
+    display: block;
+}
+
+/*boton del panel de vendedor*/
+.btn-admin{
+    display: inline-block;
+    margin-top: 1rem;
+    border-radius: 5rem;
+    background-color: #fff;
+    color:var(--negro);
+    padding: .9rem 3.5rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.btn-admin:hover{
+    background: var(--amarillo);
+}
+
+/*toggle principal para mostrar el panel del vendedor*/
+/*ocultar checkbox*/
+#admin-toggle {
+    display: none;
+}
+
+/*overlay del panel interno para que cubra toda la pantalla*/
+.admin-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: white;
+    z-index: 99999;
+    padding: 40px;
+    display: none;
+    overflow-y: auto;
+}
+
+#admin-toggle:checked ~ .admin-panel {
+    display: block;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+
+/*configuracion de la seccion principal para que la imagen cubra todo el fondo*/
 .home{
     display: flex;
     align-items: center;
@@ -143,20 +237,21 @@ header .fa-bars{
     line-height: 1.5;
 }
 
-.about {
+/*seccion informativa con distribucion en dos columnas */
+.about{
     padding: 60px 9%;
 }
 
-.titulo-about {
+.titulo-about{
     text-align: center;
     font-size: 5rem;
     margin-bottom: 40px;
     font-family: "Manrope", sans-serif;
     font-weight: bold;
-    text-transform: uppercase;
+    text-transform: none;
 }
 
-.about-container {
+.about-container{
     padding: 20px 30px;
     background-color: #fff;
     border-radius: 30px;
@@ -166,113 +261,87 @@ header .fa-bars{
     align-items: flex-start;
 }
 
-.about-left {
+.about-left{
     flex: 2;
 }
 
-.about-left p {
+.about-left p{
     font-size: 1.5rem;
     color: #333;
     line-height: 1.7;
     margin-bottom: 15px;
 }
 
-.about-right {
+.about-right{
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
-.about-item {
+.about-item{
     display: flex;
     align-items: flex-start;
     gap: 15px;
 }
 
-.about-item i {
+.about-item i{
     font-size: 2.2rem;
     color: var(--azul);
     margin-top: 5px;
 }
 
-.about-item h4 {
+.about-item h4{
     font-size: 1.6rem;
     margin-bottom: 5px;
     color: var(--negro);
 }
 
-.about-item p {
+.about-item p{
     font-size: 1.3rem;
     color: #555;
 }
 
-.services {
+/*tarjetas de servicios con hover suave para destacar cada opcion*/
+.services{
   padding: 40px 20px;
   text-align: center;
 }
 
-.contenedor-servicios {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+.card{
+  border-radius: 15px;
+  transition: 0.3s ease;
 }
 
-.serv{
-    text-align: center;
-    font-size: 4rem;
-    margin-bottom: 30px;
-    text-transform: uppercase;
-    position: relative;
-    font-family: "Archivo Black", sans-serif;
+.card:hover{
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-.serv span{
-    text-align: center;
-    font-size: 4rem;
-    margin-bottom: 40px;
-    font-family: "Manrope", sans-serif;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.card {
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
-}
-
-.card i {
+.card i{
   font-size: 30px;
   margin-bottom: 10px;
-  color:var(--azul) 
+  color: var(--azul);
 }
 
-.card h5 {
+.card h5{
   font-size: 2rem;
   margin-bottom: 10px;
 }
 
-.card p {
+.card p{
   font-size: 1.2rem;
   color: #555;
 }
 
 
-.contact {
+/*seccion de contacto dividida entre formulario e informacion*/
+.contact{
     padding: 20px 9%;
     background: #fff;
 }
 
-.titulo-contacto {
+.titulo-contacto{
     text-align: center;
     font-size: 4rem;
     font-weight: bold;
@@ -280,13 +349,13 @@ header .fa-bars{
     font-family: "Manrope", sans-serif;
 }
 
-.contact-container {
+.contact-container{
     display: flex;
     gap: 50px;
     align-items: flex-start;
 }
 
-.contact-form {
+.contact-form{
     flex: 2;
     display: flex;
     flex-direction: column;
@@ -294,19 +363,19 @@ header .fa-bars{
 }
 
 .contact-form input,
-.contact-form textarea {
+.contact-form textarea{
     padding: 12px;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 1.4rem;
 }
 
-.contact-form textarea {
+.contact-form textarea{
     min-height: 120px;
     resize: none;
 }
 
-.contact-form button {
+.contact-form button{
     background: var(--azul);
     color: #fff;
     padding: 12px;
@@ -315,30 +384,30 @@ header .fa-bars{
     cursor: pointer;
 }
 
-.contact-form button:hover {
-    background: var(--negro);
+.contact-form button:hover{
+    background: var(--amarillo);
 }
 
-/* INFO */
-.contact-info {
+/*informacion de contacto*/
+.contact-info{
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.info-item {
+.info-item{
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.info-item i {
+.info-item i{
     font-size: 2rem;
     color: var(--azul);
 }
 
-.info-item p {
+.info-item p{
     font-size: 1.4rem;
     color: #333;
 }
@@ -348,8 +417,112 @@ header .fa-bars{
     font-size: 15px;
 }
 
+/*estilos visuales del contenido del panel administrativo*/
+.admin-panel{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #dadcf7;
+    z-index: 99999;
+    padding: 30px;
+    display: none;
+    overflow-y: auto;
+}
+
+.admin-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--azul);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.admin-header h2{
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+.close-btn{
+    font-size: 2rem;
+    cursor: pointer;
+    color: white;
+}
+
+.admin-box{
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.admin-box h6{
+    font-size: 1.4rem;
+    color: #666;
+}
+
+.admin-box h3{
+    font-size: 2.5rem;
+    color: var(--azul);
+}
+
+.admin-subtitle{
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.admin-card{
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.admin-card:hover{
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.admin-card img{
+    height: 180px;
+    object-fit: cover;
+}
+
+.text-price{
+    font-weight: bold;
+    color: var(--azul);
+}
+
+.admin-table{
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.admin-table thead{
+    background: var(--azul);
+    color: white;
+    font-size: 1.3rem;
+}
+
+.admin-table td{
+    font-size: 1.3rem;
+    padding: 12px;
+}
+
+.admin-table tbody tr:hover{
+    background-color: #f3f4ff;
+}
+
 
 /* adaptabilidad responsiva */
+/*ajustes responsivos generales para tablet*/
 @media(max-width:991px){
     html{
     font-size: 55%;
@@ -368,6 +541,7 @@ header .fa-bars{
     }
 }
 
+/*reorganiza header cuando entra el menu de las tres rayitas */
 @media(max-width:768px){
     
     header .fa-bars{
@@ -407,12 +581,14 @@ header .fa-bars{
     }
 }
 
+/*reduce la escala base para telefonos pequenos*/
 @media(max-width:450px){
     html{
         font-size: 50%;
     }
 }
 
+/*about cambia a una sola columna en pantallas medianas o pequenas*/
 @media(max-width: 991px){
     .about-container {
         flex-direction: column;
@@ -423,6 +599,7 @@ header .fa-bars{
     }
 }
 
+/*contacto se apila para mejorar lectura en celular*/
 @media(max-width:991px){
     .contact-container {
         flex-direction: column;
