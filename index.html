@@ -9,27 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!--referencia al file css -->
     <link rel="stylesheet" href="css/styles.css">
-
 </head>
-
-
 <body>
-  <!-- checkbox para abrir y cerrar el panel de vendedor -->
-  <input type="checkbox" id="admin-toggle">
-
   <header>
-    <!-- toggle del menu de las tres barritas para una pantalla mas pequena -->
     <input type="checkbox" name="" id="toggler">
     <label for="toggler" class="fas fa-bars"></label>
-    <!-- encabezado principal con el logo, barra de navegacionm y acceso al panel de vendedor-->
-    <a href="#" class="logo">NicaGrow<span>.</span></a> 
+    <a href="#" class="logo">NicaGrow<span>.</span></a>
     <h1>Empeza a emprender</h1>
 
     <nav class="navbar">
-      <!-- hipervinculos de la pagina web -->
         <ul>
             <a href="#inicio">Inicio</a>
             <a href="#aboutus">Acerca</a>
@@ -38,59 +27,43 @@
         </ul>
     </nav>
 
-    <!-- toggle del menu de usuario -->
     <div class="icons user-menu">
-
         <input type="checkbox" id="user-toggle">
-
         <label for="user-toggle" class="fas fa-user"></label>
-
         <div class="menu">
-    <label for="admin-toggle" class="btn-admin">
-    Panel Administrador
-    </label>
+            <a href="dashboard.html" class="btn-admin">Panel Administrador</a>
+        </div>
     </div>
+  </header>
 
-    </div>
-
-</header>
-
-<!-- inicio de la seccion inicial -->
-<section class="home" id="inicio">
-
+  <section class="home" id="inicio">
     <div class="content">
-    <h3>Impulsando el emprendimiento nicaragüense</h3>
-    <span>Compra y vende productos nacionales en un solo lugar</span>
-    <p>
-    NicaGrow es una plataforma que conecta emprendedores con compradores, facilitando la venta y adquisición de productos nacionales de forma rápida, accesible y segura.
-    </p>
-    <a href="#" class="btn">Ingresar</a>
+      <h3>Impulsando el emprendimiento nicaragüense</h3>
+      <span>Compra y vende productos nacionales en un solo lugar</span>
+      <p>
+        NicaGrow es una plataforma que conecta emprendedores con compradores, facilitando la venta y adquisición de productos nacionales de forma rápida, accesible y segura.
+      </p>
+      <a href="#" class="btn">Ingresar</a>
     </div>
+  </section>
 
-</section>
-<!-- fin de la seccion inicial -->
-
-<!-- inicio de la seccion informativa -->
-<section class="about" id="aboutus">
-
+  <section class="about" id="aboutus">
     <h2 class="titulo-about">Sobre Nosotros</h2>
 
     <div class="about-container">
-
         <div class="about-left">
             <p>
-            NicaGrow conecta emprendedores con compradores en un solo lugar,
-            facilitando la venta de productos nacionales.
+                NicaGrow conecta emprendedores con compradores en un solo lugar,
+                facilitando la venta de productos nacionales.
             </p>
 
             <p>
-            Buscamos impulsar el comercio digital en Nicaragua y apoyar
-            el crecimiento de pequeños negocios.
+                Buscamos impulsar el comercio digital en Nicaragua y apoyar
+                el crecimiento de pequeños negocios.
             </p>
         </div>
 
         <div class="about-right">
-
             <div class="about-item">
                 <i class="fas fa-lightbulb"></i>
                 <div>
@@ -114,83 +87,70 @@
                     <p>Impulsar negocios y consumo nacional.</p>
                 </div>
             </div>
-
         </div>
-
     </div>
+  </section>
 
-</section>
-<!-- fin de la seccion informativa -->
+  <section class="services py-5" id="servicios">
+    <h2 class="text-center mb-5" style="font-size:3rem;">Servicios</h2>
 
-<!-- inicio de la seccion de servicios -->
-<section class="services py-5" id="servicios">
-  <!-- tarjetas con uno del framework bootstrap -->
-  <h2 class="text-center mb-5" style="font-size:3rem;">Servicios</h2>
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 text-center p-3">
+            <div class="card-body">
+              <i class="fas fa-store fs-1 mb-3"></i>
+              <h5 class="card-title">Impulsa tu negocio</h5>
+              <p class="card-text">
+                Publica y gestiona tus productos fácilmente.
+              </p>
+            </div>
+          </div>
+        </div>
 
-  <div class="container">
-    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 text-center p-3">
+            <div class="card-body">
+              <i class="fas fa-cart-shopping fs-1 mb-3"></i>
+              <h5 class="card-title">Compra fácil</h5>
+              <p class="card-text">
+                Encuentra productos nacionales rápidamente.
+              </p>
+            </div>
+          </div>
+        </div>
 
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow-sm border-0 text-center p-3">
-          <div class="card-body">
-            <i class="fas fa-store fs-1 mb-3"></i>
-            <h5 class="card-title">Impulsa tu negocio</h5>
-            <p class="card-text">
-              Publica y gestiona tus productos fácilmente.
-            </p>
+        <div class="col-md-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 text-center p-3">
+            <div class="card-body">
+              <i class="fas fa-mobile-screen fs-1 mb-3"></i>
+              <h5 class="card-title">Acceso móvil</h5>
+              <p class="card-text">
+                Disponible desde cualquier dispositivo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 text-center p-3">
+            <div class="card-body">
+              <i class="fas fa-shield-halved fs-1 mb-3"></i>
+              <h5 class="card-title">Seguridad</h5>
+              <p class="card-text">
+                Protección de datos garantizada.
+              </p>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow-sm border-0 text-center p-3">
-          <div class="card-body">
-            <i class="fas fa-cart-shopping fs-1 mb-3"></i>
-            <h5 class="card-title">Compra fácil</h5>
-            <p class="card-text">
-              Encuentra productos nacionales rápidamente.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow-sm border-0 text-center p-3">
-          <div class="card-body">
-            <i class="fas fa-mobile-screen fs-1 mb-3"></i>
-            <h5 class="card-title">Acceso móvil</h5>
-            <p class="card-text">
-              Disponible desde cualquier dispositivo.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow-sm border-0 text-center p-3">
-          <div class="card-body">
-            <i class="fas fa-shield-halved fs-1 mb-3"></i>
-            <h5 class="card-title">Seguridad</h5>
-            <p class="card-text">
-              Protección de datos garantizada.
-            </p>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
+  </section>
 
-</section>
-<!-- fin de la seccion de servicio -->
-
-<!-- inicio de la seccion de contacto -->
-<section class="contact" id="contacto">
-
+  <section class="contact" id="contacto">
     <h2 class="titulo-contacto">Contacto</h2>
 
     <div class="contact-container">
-
         <form class="contact-form">
             <input type="text" placeholder="Nombre">
             <input type="email" placeholder="Correo electrónico">
@@ -199,7 +159,6 @@
         </form>
 
         <div class="contact-info">
-
             <div class="info-item">
                 <i class="fas fa-envelope"></i>
                 <p>contacto@nicagrow.com</p>
@@ -214,123 +173,13 @@
                 <i class="fas fa-location-dot"></i>
                 <p>Nicaragua</p>
             </div>
-
         </div>
-
     </div>
+  </section>
 
-</section>
-<!-- fin de la seccion de contacto -->
-
-<!-- panel del vendedor/administrador -->
- <!-- se muestra al activar la checkbox del header -->
-<div class="admin-panel">
-
-  <div class="admin-header">
-    <h2>Panel del Vendedor</h2>
-    <label for="admin-toggle" class="close-btn">✖</label>
-  </div>
-<!-- resumen del contenido de los vendedores -->
-  <div class="container-fluid">
-
-    <div class="row text-center mb-5">
-
-      <div class="col-md-4 mb-3">
-        <div class="admin-box">
-          <h6>Productos</h6>
-          <h3>6</h3>
-        </div>
-      </div>
-
-      <div class="col-md-4 mb-3">
-        <div class="admin-box">
-          <h6>Ventas</h6>
-          <h3>2</h3>
-        </div>
-      </div>
-
-      <div class="col-md-4 mb-3">
-        <div class="admin-box">
-          <h6>Ingresos</h6>
-          <h3>C$520</h3>
-        </div>
-      </div>
-
-    </div>
-
-    <h3 class="admin-subtitle">Mis Productos</h3>
-  <!-- cards utilizando el framework bootstap -->
-    <div class="row g-4">
-
-      <div class="col-md-4">
-        <div class="card admin-card">
-          <img src="images/9e12520ad2012a0d5ca709c4197e8dff.jpg" class="card-img-top">
-          <div class="card-body">
-            <h5 class="card-title">Camisa típica</h5>
-            <p class="card-text">Camisa de traje típico tejida a mano.</p>
-            <p class="text-price">C$500</p>
-            <a href="#" class="btn btn-primary">Editar</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card admin-card">
-          <img src="images/65283311-accesorios-de-moda-femenina-y-de-diversos-artículos-de-bolsos-de-estilo-cubo-de-punto-mochilas.jpg" class="card-img-top">
-          <div class="card-body">
-            <h5 class="card-title">Bolso tejido</h5>
-            <p class="card-text">Diseño artesanal resistente.</p>
-            <p class="text-price">C$200</p>
-            <a href="#" class="btn btn-primary btn-sm">Editar</a>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <h3 class="admin-subtitle mt-5">Historial de Ventas</h3>
-
-    <!-- tabla del historial de ventas de los vendedores usando el framework boostrap -->
-    <div class="table-responsive">
-      <table class="table admin-table">
-
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cliente</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td>Camisa típica</td>
-            <td>María López</td>
-            <td>12/04/2026</td>
-            <td><span class="badge bg-success">Entregado</span></td>
-            <td>C$500</td>
-          </tr>
-
-          <tr>
-            <td>Bolso tejido</td>
-            <td>Carlos Ruiz</td>
-            <td>10/04/2026</td>
-            <td><span class="badge bg-warning text-dark">Pendiente</span></td>
-            <td>C$200</td>
-          </tr>
-        </tbody>
-
-      </table>
-    </div>
-
-  </div>
-</div>
-
-<footer class="footer">
-    <p>&copy; NicaGrow. Todos los derechos reservados</p>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <footer class="footer">
+      <p>&copy; NicaGrow. Todos los derechos reservados</p>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
