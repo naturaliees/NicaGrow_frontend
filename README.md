@@ -2,7 +2,7 @@
 Plataforma web orientada al fortalecimiento del emprendimiento local en Nicaragua, permitiendo a emprendedores publicar productos, gestionar ventas e interactuar con compradores de manera sencilla y accesible.
 
 ## Descripción del Proyecto
-NicaGrow es una plataforma diseñada para apoyar a pequeños y medianos emprendedores nicaragüenses mediante herramientas digitales que facilitan la publicación de productos, administración de información y conexión con potenciales clientes.
+NicaGrow es una plataforma diseñada para apoyar a pequeños y medianos emprendimientos de Nicaragua mediante herramientas digitales que facilitan la publicación de productos, administración de información y conexión con potenciales clientes.
 El sistema busca impulsar el crecimiento económico local ofreciendo un entorno moderno, intuitivo y accesible desde cualquier navegador web.
 
 ## Objetivos
@@ -37,8 +37,8 @@ NicaGrow/
 ├── css/
 ├── js/
 ├── images/
-├── pages/
 ├── index.html
+├── login.html
 └── README.md
 
 ## Instalación y Uso
