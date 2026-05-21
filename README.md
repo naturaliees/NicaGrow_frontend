@@ -23,9 +23,9 @@ El sistema busca impulsar el crecimiento económico local ofreciendo un entorno 
 
 ## Tecnologías Utilizadas
 * Frontend
-  *HTML5
-  *CSS3
-  *JavaScript
+  * HTML5
+  * CSS3
+  * JavaScript
 * Herramientas
   * Git
   * GitHub
@@ -42,9 +42,9 @@ NicaGrow/
 └── README.md
 
 ## Instalación y Uso
-1. Clonar el repositorio
+1. Clonar el repositorio: 
   git clone https://github.com/USUARIO/NicaGrow.git
-2. Ingresar al proyecto
+2. Ingresar al proyecto: 
   cd NicaGrow
-3. Abrir el proyecto
+3. Abrir el proyecto: 
   Abrir el archivo index.html en el navegador o utilizar una extensión como Live Server en Visual Studio Code.
