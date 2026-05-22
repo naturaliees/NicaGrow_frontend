@@ -43,7 +43,7 @@ NicaGrow/
 
 ## Instalación y Uso
 1. Clonar el repositorio: 
-  git clone https://github.com/USUARIO/NicaGrow.git
+  git clone https://github.com/naturaliees/NicaGrow_frontend
 2. Ingresar al proyecto: 
   cd NicaGrow
 3. Abrir el proyecto: 
