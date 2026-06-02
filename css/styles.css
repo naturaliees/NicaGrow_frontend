@@ -634,7 +634,7 @@ header .fa-bars{
 }
 
 .seller-top-icons a,
-.seller-top-icons button{
+.seller-top-icons .icon-btn{
     color: #404049;
     font-size: 16px;
     width: 42px;
