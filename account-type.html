@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tipo de cuenta | NicaGrow</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+            integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
+        <link rel="stylesheet" href="css/loginstyle.css">
+    </head>
+
+    <body class="account-type-page">
+        <!-- pantalla previa para elegir el tipo de cuenta -->
+        <main class="account-type-shell">
+            <a href="index.html" class="account-back-link">
+                <i class="bi bi-arrow-left"></i>
+                Volver al inicio
+            </a>
+
+            <!-- opciones disponibles antes de entrar al login -->
+            <section class="account-type-panel">
+                <div class="account-type-intro">
+                    <span class="account-type-brand">NicaGrow.</span>
+                    <h1>Elige tu tipo de cuenta</h1>
+                    <p>Selecciona cómo quieres ingresar.</p>
+                </div>
+
+                <div class="account-type-grid" aria-label="Selecciona tipo de cuenta">
+                    <button type="button" class="account-type-card" data-role="seller">
+                        <i class="bi bi-shop-window"></i>
+                        <span>Vendedor</span>
+                        <small>Publica productos y administra ventas.</small>
+                    </button>
+
+                    <button type="button" class="account-type-card" data-role="buyer">
+                        <i class="bi bi-bag-heart-fill"></i>
+                        <span>Comprador</span>
+                        <small>Explora productos nacionales.</small>
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <script src="js/account-type.js"></script>
+    </body>
+
+</html>

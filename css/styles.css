@@ -142,7 +142,7 @@ header .fa-bars{
 }
 
 /*menu emergente del perfil que se posiciona sobre el header (en el icono de persona)*/
-/*menú oculto por default*/
+/*menu oculto por default*/
 .user-menu .menu{
     position: absolute;
     top: 40px;
@@ -155,7 +155,7 @@ header .fa-bars{
     z-index: 9999;
 }
 
-/*mostrar menú cuando se activa*/
+/*mostrar menu cuando se activa*/
 #user-toggle:checked ~ .menu{
     display: block;
 }
@@ -510,7 +510,7 @@ header .fa-bars{
     }
 }
 
-/*reorganiza header cuando entra el menu de las tres rayitas */
+/*reorganiza header cuando entra el menu de hamburguesa */
 @media(max-width:768px){
     
     header .fa-bars{
@@ -617,6 +617,8 @@ header .fa-bars{
     color: #404049;
     padding: 8px 14px !important;
     line-height: 1.2;
+    background: transparent;
+    border: 0;
 }
 
 .seller-nav-links .nav-link.active{
@@ -726,6 +728,17 @@ header .fa-bars{
     object-fit: cover;
 }
 
+.seller-product-placeholder{
+    height:14rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#eef0ff;
+    color:#707388;
+    font-size:14px;
+    font-weight:800;
+}
+
 .seller-product-card .card-body{
     padding: 1.2rem 1.4rem 1.4rem;
 }
@@ -762,6 +775,165 @@ header .fa-bars{
     box-shadow: 0 8px 18px rgba(47, 59, 128, 0.08);
 }
 
+/* controla que solo se vea la seccion activa del dashboard */
+.dashboard-view{
+    display:none;
+}
+
+.dashboard-view.active{
+    display:block;
+}
+
+/* paneles blancos que agrupan informacion dentro del dashboard */
+.seller-panel{
+    background:#fff;
+    border-radius:1rem;
+    padding:1.4rem;
+    min-height:100%;
+    box-shadow:0 8px 18px rgba(47, 59, 128, 0.08);
+}
+
+/* encabezado de cada vista con titulo y contador */
+.seller-section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    margin-bottom:1.4rem;
+}
+
+.seller-section-header span{
+    font-size:14px;
+    color:#707388;
+}
+
+/* acomoda el formulario al lado del listado de productos */
+.seller-product-layout{
+    display:grid;
+    grid-template-columns:minmax(260px, 340px) 1fr;
+    gap:1.4rem;
+    align-items:start;
+}
+
+/* formulario donde el vendedor publica un producto nuevo */
+.seller-product-form{
+    background:#fff;
+    border-radius:1rem;
+    padding:1.4rem;
+    box-shadow:0 8px 18px rgba(47, 59, 128, 0.08);
+}
+
+.seller-product-form h3{
+    font-size:20px;
+    font-weight:800;
+    color:#262730;
+    margin-bottom:1rem;
+}
+
+.seller-product-form input,
+.seller-product-form textarea{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid #d9dbf2;
+    border-radius:10px;
+    font-size:14px;
+    color:#262730;
+    margin-bottom:12px;
+    background:#fff;
+}
+
+.seller-product-form textarea{
+    min-height:96px;
+    resize:none;
+}
+
+/* precio y stock comparten fila para ahorrar espacio */
+.seller-form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.seller-submit-btn{
+    width:100%;
+    min-height:42px;
+    border-radius:999px;
+    background:var(--negro);
+    color:#fff;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.seller-submit-btn:hover{
+    background:var(--azul);
+}
+
+/* etiqueta pequena para mostrar inventario disponible */
+.seller-stock{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    background:#eef0ff;
+    color:#404049;
+    font-size:13px;
+    font-weight:700;
+}
+
+.form-message{
+    min-height:22px;
+    margin-bottom:8px;
+    color:#1f8b4c;
+    font-size:13px;
+    font-weight:800;
+}
+
+.form-message.error{
+    color:#d64545;
+}
+
+/* barras sencillas para comparar ingresos por producto */
+.seller-chart{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.seller-chart-row{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.seller-chart-label{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    font-size:14px;
+    color:#404049;
+}
+
+.seller-chart-label span,
+.seller-chart-label strong{
+    font-weight:800;
+}
+
+.seller-chart-track{
+    height:12px;
+    border-radius:999px;
+    background:#eef0ff;
+    overflow:hidden;
+}
+
+.seller-chart-track span{
+    display:block;
+    height:100%;
+    border-radius:inherit;
+    background:var(--azul);
+}
+
 @media(max-width: 991px){
     .dashboard-shell{
         padding: 1.2rem;
@@ -780,4 +952,37 @@ header .fa-bars{
     .seller-profile-btn span{
         font-size: 15px;
     }
+
+    .seller-product-layout{
+        grid-template-columns:1fr;
+    }
+}
+
+.seller-session-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:42px;
+    padding:0 16px;
+    border-radius:999px;
+    background:#fff;
+    color:#404049;
+    font-size:14px;
+    font-weight:700;
+    box-shadow:0 8px 18px rgba(47, 59, 128, 0.08);
+}
+
+.seller-logout-btn{
+    display: inline-block;
+    margin-top: 1rem;
+    border-radius: 5rem;
+    background: var(--negro);
+    color: #fff;
+    padding: .9rem 3.5rem;
+    cursor: pointer;
+    font-size: 1.7rem;
+}
+
+.seller-logout-btn:hover{
+    background: var(--amarillo);
 }

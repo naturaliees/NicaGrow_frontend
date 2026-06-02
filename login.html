@@ -1,112 +1,157 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-        integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="css/loginstyle.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login | NicaGrow</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+            integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
+        <link rel="stylesheet" href="css/loginstyle.css">
+    </head>
 
-<body>
-    <div class="container">
-        <div class="form-box login">
-            <form action="">
-                <h1>Iniciar sesión</h1>
-                <div class="input-box">
-                    <input type="text" placeholders="Correo electrónico" required>
-                    <i class="bi bi-person-fill"></i>
-                </div>
-                <div class="input-box">
-                    <input type="password" placeholders="Contraseña" required>
-                    <i class="bi bi-lock-fill"></i>
-                </div>
-                <div class="forgot-link">
-                    <a href="#">¿Olvidaste tu contraseña?</a>
-                    <button type="submit" class="btn">
-                        Iniciar sesión
-                    </button>
-                    <p>Iniciar sesión con otras plataformas</p>
-                    <div class="social-icons">
-                        <a href="#"><i class="bi bi-google"></i></a>
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="form-box register">
-            <form action="">
-                <h1>Regístrate</h1>
+    <body>
+        <!-- contenedor principal con login, registro y paneles laterales -->
+        <div class="container">
+            <!-- formulario para iniciar sesion -->
+            <div class="form-box login">
+                <form id="loginForm" novalidate>
+                    <h1>Iniciar sesión</h1>
+                    <p class="form-subtitle">Accede según el tipo de cuenta que registraste.</p>
 
-                <div class="register-grid">
+                    <div class="form-message" id="loginMessage" aria-live="polite"></div>
 
                     <div class="input-box">
-                        <input type="text" placeholder="Nombre" required>
+                        <input id="loginEmail" name="email" type="email" placeholder="Correo electrónico" required>
+                        <i class="bi bi-envelope-fill"></i>
                     </div>
 
                     <div class="input-box">
-                        <input type="text" placeholder="Apellidos" required>
-                    </div>
-
-                    <div class="input-box full-width">
-                        <input type="text" placeholder="Correo electrónico" required>
-                        <i class="bi bi-person-fill"></i>
-                    </div>
-
-                    <div class="input-box full-width">
-                        <input type="password" placeholder="Contraseña" required>
+                        <input id="loginPassword" name="password" type="password" placeholder="Contraseña" required>
                         <i class="bi bi-lock-fill"></i>
                     </div>
 
-                    <div class="input-box">
-                        <input type="date" required>
+                    <div class="forgot-link">
+                        <a href="#">¿Olvidaste tu contraseña?</a>
                     </div>
 
-                    <div class="input-box">
-                        <input type="text" placeholder="Número telefónico" required>
+                    <button type="submit" class="btn">Iniciar sesión</button>
+
+                    <p>Inicia sesión con otras plataformas</p>
+
+                    <div class="social-icons">
+                        <a href="#" aria-label="Google"><i class="bi bi-google"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- formulario para crear una cuenta nueva -->
+            <div class="form-box register">
+                <form id="registerForm" novalidate>
+                    <!-- primer paso para escoger comprador o vendedor -->
+                    <div class="register-step role-step active" data-step="roles">
+                        <h1>Elige tu cuenta</h1>
+                        <p class="form-subtitle">Selecciona cómo quieres usar NicaGrow antes de registrarte.</p>
+
+                        <div class="form-message" id="registerRoleMessage" aria-live="polite"></div>
+
+                        <div class="role-selector" id="roleSelector">
+                            <button type="button" class="role-card" data-role="seller">
+                                <i class="bi bi-shop-window"></i>
+                                <span>Vendedor</span>
+                                <small>Publica productos, gestiona ventas y usa el dashboard.</small>
+                            </button>
+
+                            <button type="button" class="role-card" data-role="buyer">
+                                <i class="bi bi-bag-heart-fill"></i>
+                                <span>Comprador</span>
+                                <small>Explora productos, compra y guarda tus datos como cliente.</small>
+                            </button>
+                        </div>
+
+                        <input type="hidden" id="registerRole" name="role" required>
+
+                        <button type="button" class="btn" id="continueRegisterBtn">Continuar</button>
                     </div>
 
-                    <div class="input-box full-width">
-                        <input type="text" placeholder="Ciudad" required>
-                    </div>
+                    <!-- segundo paso con los datos personales -->
+                    <div class="register-step details-step" data-step="details">
+                        <div class="register-step-header">
+                            <button type="button" class="step-back-btn" id="backToRolesBtn">
+                                <i class="bi bi-arrow-left"></i>
+                            </button>
+                            <div>
+                                <h1>Regístrate</h1>
+                                <p class="selected-role-text">Cuenta seleccionada: <strong
+                                        id="selectedRoleLabel">Vendedor</strong></p>
+                            </div>
+                        </div>
 
+                        <div class="form-message" id="registerMessage" aria-live="polite"></div>
+
+                        <div class="register-grid">
+                            <div class="input-box">
+                                <input id="firstName" name="firstName" type="text" placeholder="Nombre" required>
+                            </div>
+
+                            <div class="input-box">
+                                <input id="lastName" name="lastName" type="text" placeholder="Apellidos" required>
+                            </div>
+
+                            <div class="input-box full-width">
+                                <input id="registerEmail" name="email" type="email" placeholder="Correo electrónico"
+                                    required>
+                                <i class="bi bi-envelope-fill"></i>
+                            </div>
+
+                            <div class="input-box full-width">
+                                <input id="registerPassword" name="password" type="password" placeholder="Contraseña"
+                                    minlength="6" required>
+                                <i class="bi bi-lock-fill"></i>
+                            </div>
+
+                            <div class="input-box">
+                                <input id="birthDate" name="birthDate" type="date" required>
+                            </div>
+
+                            <div class="input-box">
+                                <input id="phone" name="phone" type="tel" placeholder="Número telefónico" required>
+                            </div>
+
+                            <div class="input-box full-width">
+                                <input id="city" name="city" type="text" placeholder="Ciudad" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn">Crear cuenta</button>
+
+                        <p>Regístrate con otras plataformas</p>
+
+                        <div class="social-icons">
+                            <a href="#" aria-label="Google"><i class="bi bi-google"></i></a>
+                            <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- paneles para cambiar entre registro e inicio de sesion -->
+            <div class="toggle-box">
+                <div class="toggle-panel toggle-left">
+                    <h1>Hola, bienvenido</h1>
+                    <p>¿No tienes una cuenta?</p>
+                    <button class="btn register-btn" type="button">Registrarse</button>
                 </div>
-
-                <button type="submit" class="btn">
-                    Registrarse
-                </button>
-
-                <p>Registrarse con otras plataformas</p>
-
-                <div class="social-icons">
-                    <a href="#"><i class="bi bi-google"></i></a>
-                    <a href="#"><i class="bi bi-facebook"></i></a>
+                <div class="toggle-panel toggle-right">
+                    <h1>Bienvenido de nuevo</h1>
+                    <p>¿Ya tienes una cuenta?</p>
+                    <button class="btn login-btn" type="button">Iniciar sesión</button>
                 </div>
-            </form>
+            </div>
         </div>
 
-        <div class="toggle-box">
-            <div class="toggle-panel toggle-left">
-                <h1>Hola, Bienvenido</h1>
-                <p>¿No tienes una cuenta?</p>
-                <button class="btn register-btn">
-                    Registrarse
-                </button>
-            </div>
-            <div class="toggle-panel toggle-right">
-                <h1>Bienvenido</h1>
-                <p>¿Ya tienes una cuenta?</p>
-                <button class="btn login-btn">
-                    Iniciar sesión
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="js/script.js"></script>
-
-</body>
+        <script src="js/script.js"></script>
+    </body>
 
 </html>

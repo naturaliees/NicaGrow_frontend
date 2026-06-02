@@ -1,335 +1,572 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@200..800&display=swap');
 
-
+/* colores base para login, registro y seleccion de cuenta */
 :root{
-
-    /*variables base para reutilizar colores en todo el sitio*/
     --azul:#4a52eb;
     --celeste:#e8e9fc;
     --amarillo:#d1f577;
     --negro:#19191d;
 }
 
-/*reset general para normalizar margenes, cajas y tipografia */
+/* reset general para mantener los estilos consistentes */
 *{
-    margin:0; padding:0;
-    box-sizing: border-box;
-    font-family: "Manrope", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: normal;
-    font-style: normal;
-    outline: none; border:none;
-    text-decoration: none;
-    text-transform: none;
-    transition: .2s linear;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Manrope", sans-serif;
+    font-optical-sizing:auto;
+    font-weight:normal;
+    font-style:normal;
+    outline:none;
+    border:none;
+    text-decoration:none;
+    text-transform:none;
+    transition:.2s linear;
 }
 
+/* fondo principal de las pantallas de acceso */
 body{
     background: linear-gradient(90deg, #fff, var(--azul));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
 }
 
-/* login principal */
+/* pantalla previa donde se elige comprador o vendedor */
+.account-type-page{
+    background:linear-gradient(90deg, #fff, var(--azul));
+    padding:24px;
+}
+
+/* contenedor de la pantalla para escoger tipo de cuenta */
+.account-type-shell{
+    width:min(980px, 100%);
+}
+
+/* enlace para regresar al inicio */
+.account-back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:var(--negro);
+    font-weight:800;
+    margin-bottom:18px;
+}
+
+/* panel principal de la seleccion de cuenta */
+.account-type-panel{
+    background:rgba(255,255,255,0.82);
+    border:1px solid rgba(25, 25, 29, 0.08);
+    border-radius:28px;
+    box-shadow:0 24px 55px rgba(25, 25, 29, 0.16);
+    padding:44px;
+}
+
+/* texto introductorio de la seleccion de cuenta */
+.account-type-intro{
+    max-width:640px;
+    margin-bottom:30px;
+}
+
+/* marca pequena que aparece antes del titulo */
+.account-type-brand{
+    display:inline-block;
+    margin-bottom:12px;
+    color:var(--azul);
+    font-size:20px;
+    font-weight:900;
+}
+
+.account-type-intro h1{
+    font-size:42px;
+    margin-bottom:12px;
+}
+
+.account-type-intro p{
+    color:#3f4051;
+    font-size:16px;
+    line-height:1.6;
+}
+
+/* tarjetas para escoger comprador o vendedor */
+.account-type-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:18px;
+}
+
+.account-type-card{
+    min-height:250px;
+    padding:30px;
+    border-radius:18px;
+    background:#fff;
+    border:2px solid transparent;
+    color:var(--negro);
+    text-align:left;
+    cursor:pointer;
+    box-shadow:0 12px 28px rgba(47, 59, 128, 0.08);
+}
+
+.account-type-card:hover{
+    border-color:var(--azul);
+    transform:translateY(-4px);
+    box-shadow:0 18px 34px rgba(74, 82, 235, 0.16);
+}
+
+.account-type-card i{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:58px;
+    height:58px;
+    margin-bottom:24px;
+    border-radius:16px;
+    background:var(--celeste);
+    color:var(--azul);
+    font-size:30px;
+}
+
+.account-type-card span{
+    display:block;
+    margin-bottom:10px;
+    font-size:25px;
+    font-weight:900;
+}
+
+.account-type-card small{
+    display:block;
+    color:#4d5060;
+    font-size:15px;
+    line-height:1.6;
+}
+
+/* caja principal que contiene login, registro y panel lateral */
 .container{
-    position: relative;
-    width: 850px;
-    height: 550px;
-    background: var(--celeste);
-    border-radius: 30px;
-    box-shadow: 0 0 30px rgba(0, 0, 0, .2);
-    margin: 20px;
-    overflow: hidden;
+    position:relative;
+    width:850px;
+    min-height:550px;
+    background:var(--celeste);
+    border-radius:30px;
+    box-shadow:0 0 30px rgba(0, 0, 0, .2);
+    margin:20px;
+    overflow:hidden;
 }
 
+/* base compartida por los formularios de login y registro */
 .form-box{
-    position: absolute;
-    right: 0;
-    width: 50%;
-    height: 100%;
-    background-color: var(--celeste);
-    display: flex;
-    align-items: center;
-    color: #19191d;
-    text-align: center;
-    padding: 40px;
-    z-index: 1;
-    transition: .6 ease-in-out 1.2s, visibility 0s 1s;
+    position:absolute;
+    right:0;
+    width:50%;
+    height:100%;
+    background-color:var(--celeste);
+    display:flex;
+    align-items:center;
+    color:var(--negro);
+    text-align:center;
+    padding:40px;
+    z-index:1;
+    transition:right .6s ease-in-out, visibility 0s 1s;
 }
 
 .container.active .form-box{
-    right: 50%;
+    right:50%;
 }
 
 .form-box.register{
-    visibility: hidden;
+    visibility:hidden;
 }
 
 .container.active .form-box.register{
-    visibility: visible;
+    visibility:visible;
 }
 
-.form-box.register form{
-    width: 100%;
-}
-
-.form-box.register .register-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.form-box.register .input-box{
-    position: relative;
-    margin: 0;
-}
-
-.form-box.register .full-width{
-    grid-column: span 2;
-}
-
-.form-box.register .input-box input{
-    width: 100%;
-    padding: 13px 50px 13px 20px;
-    background: #fff;
-    border-radius: 8px;
-    font-size: 16px;
-    color: var(--negro);
-    font-weight: 500;
-}
-
-.form-box.register .input-box i{
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    color: var(--negro);
-}
-
+/* ancho completo para cada formulario */
 form{
-    width: 100%;
+    width:100%;
 }
 
-.login-container h1{
-    font-size: 36px;
-    margin: -10px 0;
+/* titulos y textos pequenos dentro de los formularios */
+h1{
+    font-size:36px;
+    margin-bottom:10px;
 }
 
+.form-subtitle,
+.selected-role-text,
+.login-container p,
+form p{
+    font-size:14.5px;
+    color:#3f4051;
+}
+
+/* mensajes de error o confirmacion del formulario */
+.form-message{
+    min-height:24px;
+    margin:12px 0 4px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--rojo);
+}
+
+.form-message.success{
+    color:var(--verde);
+}
+
+/* campos de texto con icono a la derecha */
 .input-box{
-    position: relative;
-    margin: 30px 0;
+    position:relative;
+    margin:18px 0;
 }
 
 .input-box input{
-    width: 100%;
-    padding: 13px 50px 13px 20px;
-    background: #fff;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    color: var(--negro);
-    font-weight: 500;
+    width:100%;
+    padding:13px 50px 13px 20px;
+    background:#fff;
+    border-radius:8px;
+    font-size:16px;
+    color:var(--negro);
+    font-weight:500;
+    border:1px solid transparent;
 }
 
 .input-box input::placeholder{
-    color: var(--negro);
-    font-weight: 400;
+    color:var(--negro);
+    font-weight:400;
+}
+
+.input-box input:focus{
+    border-color:var(--azul);
 }
 
 .input-box i{
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    color: var(--negro);
+    position:absolute;
+    right:20px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:20px;
+    color:var(--negro);
 }
 
+/* enlace de recuperar contrasena */
 .forgot-link{
-    margin: -15px 0 15px;
+    margin:-2px 0 18px;
+    text-align:right;
 }
 
 .forgot-link a{
-    font-size: 14.5px;
-    color: var(--negro);
-    text-decoration: none;
+    font-size:14.5px;
+    color:var(--negro);
 }
 
+/* boton principal reutilizado en login y registro */
 .btn{
-    width: 100%;
-    height: 48px;
-    display: inline-block;
-    margin-top: 1rem;
-    border-radius: 5rem;
-    background: var(--negro);
-    color: #fff;
-    cursor: pointer;
-    font-size: 16px;
+    width:100%;
+    height:48px;
+    display:inline-block;
+    margin-top:1rem;
+    border-radius:5rem;
+    background:var(--negro);
+    color:#fff;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:700;
 }
 
 .btn:hover{
     background:var(--amarillo);
+    color:var(--negro);
 }
 
-.login-container p{
-    font-size: 14.5px;
-    margin: 15px 0;
-}
-
+/* botones sociales del formulario */
 .social-icons{
-    display: flex;
-    justify-content: center;
+    display:flex;
+    justify-content:center;
+    margin-top:8px;
 }
 
 .social-icons a{
-    display: inline-flex;
-    padding: 10px;
-    border: 1px solid var(--celeste);
-    border-radius: 8px;
-    font-size: 24px;
-    color: var(--negro);
-    text-decoration: none;
-    margin: 0 8px;
+    display:inline-flex;
+    padding:10px;
+    border:1px solid rgba(25, 25, 29, 0.12);
+    border-radius:8px;
+    font-size:24px;
+    color:var(--negro);
+    margin:0 8px;
+    background:#fff;
 }
 
+/* selector de rol dentro del registro */
+.role-selector{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin:26px 0 12px;
+}
+
+.role-card{
+    background:#fff;
+    border:2px solid transparent;
+    border-radius:18px;
+    padding:20px 16px;
+    text-align:left;
+    color:var(--negro);
+    cursor:pointer;
+    min-height:180px;
+}
+
+.role-card:hover,
+.role-card.active{
+    border-color:var(--azul);
+    transform:translateY(-3px);
+    box-shadow:0 12px 24px rgba(74, 82, 235, 0.12);
+}
+
+.role-card i{
+    font-size:28px;
+    margin-bottom:14px;
+    display:block;
+    color:var(--azul);
+}
+
+.role-card span{
+    display:block;
+    font-size:18px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.role-card small{
+    display:block;
+    font-size:13px;
+    line-height:1.5;
+    color:#4d5060;
+}
+
+/* pasos del registro */
+.register-step{
+    display:none;
+}
+
+.register-step.active{
+    display:block;
+}
+
+/* encabezado del segundo paso de registro */
+.register-step-header{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:12px;
+    text-align:left;
+}
+
+.register-step-header h1{
+    margin-bottom:4px;
+}
+
+/* boton para regresar al paso anterior */
+.step-back-btn{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#fff;
+    color:var(--negro);
+    cursor:pointer;
+    flex-shrink:0;
+    box-shadow:0 8px 18px rgba(25, 25, 29, 0.08);
+}
+
+/* cuadricula de campos del registro */
+.register-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:18px;
+}
+
+.register-grid .input-box{
+    margin:0;
+}
+
+.full-width{
+    grid-column:span 2;
+}
+
+/* panel amarillo que cambia entre login y registro */
 .toggle-box{
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    position:absolute;
+    width:100%;
+    height:100%;
 }
 
 .toggle-box::before{
-    content: '';
-    position: absolute;
-    left: -250%;
-    width: 300%;
-    height: 100%;
-    background: var(--amarillo);
-    /* border: 2px solid var(--negro); */
-    border-radius: 150px;
-    z-index: 2;
-    transition: 1.8s ease-in-out ;
+    content:'';
+    position:absolute;
+    left:-250%;
+    width:300%;
+    height:100%;
+    background:var(--amarillo);
+    border-radius:150px;
+    z-index:2;
+    transition:1.8s ease-in-out;
 }
 
 .toggle-panel{
-    position: absolute;
-    width: 50%;
-    height: 100%;
-    /* background: var(--amarillo); */
-    color: var(--negro);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 2;
-    transition: .6s ease-in-out;
+    position:absolute;
+    width:50%;
+    height:100%;
+    color:var(--negro);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:2;
+    transition:.6s ease-in-out;
+    text-align:center;
+    padding:20px;
 }
 
 .container.active .toggle-box::before{
-    left: 50%;
+    left:50%;
 }
 
 .toggle-panel.toggle-left{
-    left: 0;
-    transition-delay: 1.2s;
+    left:0;
+    transition-delay:1.2s;
 }
 
 .container.active .toggle-panel.toggle-left{
-    left: -50%;
-    transition-delay: .6s;
+    left:-50%;
+    transition-delay:.6s;
 }
 
 .toggle-panel.toggle-right{
-    right: -50%;
-    transition-delay: .6s;
+    right:-50%;
+    transition-delay:.6s;
 }
 
 .container.active .toggle-panel.toggle-right{
-    right: 0;
-    transition-delay: 1.2s;
+    right:0;
+    transition-delay:1.2s;
 }
 
 .toggle-panel p{
-    margin-bottom: 20px;
+    margin-bottom:20px;
 }
 
 .toggle-panel .btn{
-    width: 160px;
-    height: 46px;
-    background: var(--amarillo);
-    border:  2px solid var(--negro);
-    color: var(--negro);
+    width:160px;
+    height:46px;
+    background:var(--amarillo);
+    border:2px solid var(--negro);
+    color:var(--negro);
 }
 
 .toggle-panel .btn:hover{
-    background: var(--negro);
-    color: #fff;
+    background:var(--negro);
+    color:#fff;
 }
 
+/* ajustes para pantallas pequenas */
 @media screen and (max-width: 650px){
     .container{
-        height: calc(100vh - 40px);
+        min-height:calc(100vh - 40px);
     }
 
     .form-box{
-        bottom: 0;
-        width: 100%;
-        height: 70%;
+        bottom:0;
+        width:100%;
+        height:72%;
+        padding:28px 20px;
     }
 
     .container.active .form-box{
-        right: 0;
-        bottom: 30%;
+        right:0;
+        bottom:28%;
     }
 
     .toggle-box::before{
-        left: 0;
-        top: -270%;
-        width: 100%;
-        height: 300%;
-        border-radius: 20vw;
+        left:0;
+        top:-270%;
+        width:100%;
+        height:300%;
+        border-radius:20vw;
     }
 
     .container.active .toggle-box::before{
-        left: 0;
-        top: 70%;
+        left:0;
+        top:72%;
     }
 
     .toggle-panel{
-        width: 100%;
-        height: 30%;
+        width:100%;
+        height:28%;
     }
 
     .toggle-panel.toggle-left{
-        top: 0;
+        top:0;
     }
 
     .container.active .toggle-panel.toggle-left{
-        left: 0;
-        top: -30%;
+        left:0;
+        top:-28%;
     }
 
     .toggle-panel.toggle-right{
-        right: 0;
-        bottom: -30%;
+        right:0;
+        bottom:-28%;
     }
 
     .container.active .toggle-panel.toggle-right{
-        bottom: 0;
+        bottom:0;
+    }
+
+    .role-selector,
+    .register-grid,
+    .account-type-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full-width{
+        grid-column:span 1;
     }
 }
 
-@media screen and (max-width: 400px){
-    .form-box{
-        padding: 20px;
+/* ajustes de la pantalla de tipo de cuenta en celular */
+@media screen and (max-width: 560px){
+    .account-type-page{
+        padding:16px;
+        align-items:flex-start;
     }
 
-    .toggle-panel h1{
-        font-size: 30px;
+    .account-type-panel{
+        padding:28px 20px;
+        border-radius:22px;
+    }
+
+    .account-type-intro h1{
+        font-size:32px;
+    }
+
+    .account-type-card{
+        min-height:auto;
+        padding:24px;
+    }
+}
+
+/* ajustes finales para telefonos muy pequenos */
+@media screen and (max-width: 400px){
+    .form-box{
+        padding:18px;
+    }
+
+    .toggle-panel h1,
+    h1{
+        font-size:30px;
+    }
+
+    .role-card{
+        min-height:auto;
     }
 }
