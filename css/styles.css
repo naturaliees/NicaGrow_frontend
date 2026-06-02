@@ -236,6 +236,7 @@ header .fa-bars{
 
 .about-left p{
     font-size: 1.5rem;
+    text-align: justify;
     color: #333;
     line-height: 1.7;
     margin-bottom: 15px;
