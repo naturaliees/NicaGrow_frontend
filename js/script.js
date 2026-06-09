@@ -1,6 +1,6 @@
-const USERS_KEY = 'nicagrowUsers';
-const SESSION_KEY = 'nicagrowCurrentUser';
-const ACCOUNT_TYPE_KEY = 'nicagrowSelectedRole';
+const usersKey = 'nicagrowUsers';
+const sessionKey = 'nicagrowCurrentUser';
+const accountTypeKey = 'nicagrowSelectedRole';
 
 // elementos principales del formulario
 const container = document.querySelector('.container');
@@ -29,13 +29,13 @@ const roleLabels = {
 
 // obtiene el rol que se escogio antes de entrar al login
 function getSelectedAccountType() {
-    return localStorage.getItem(ACCOUNT_TYPE_KEY);
+    return localStorage.getItem(accountTypeKey);
 }
 
 // lee los usuarios guardados en el navegador
 function getUsers() {
     try {
-        const users = JSON.parse(localStorage.getItem(USERS_KEY));
+        const users = JSON.parse(localStorage.getItem(usersKey));
 
         if (users) {
             return users;
@@ -49,12 +49,12 @@ function getUsers() {
 
 // guarda la lista completa de usuarios
 function saveUsers(users) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    localStorage.setItem(usersKey, JSON.stringify(users));
 }
 
 // guarda el usuario que inicio sesion
 function saveSession(user) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+    localStorage.setItem(sessionKey, JSON.stringify(user));
 }
 
 // muestra mensajes de error o exito en los formularios
@@ -86,7 +86,7 @@ function clearMessage(element) {
 function setSelectedRole(role) {
     registerRoleInput.value = role;
     selectedRoleLabel.textContent = roleLabels[role] || 'Cuenta';
-    localStorage.setItem(ACCOUNT_TYPE_KEY, role);
+    localStorage.setItem(accountTypeKey, role);
 
     for (let i = 0; i < roleCards.length; i++) {
         if (roleCards[i].dataset.role === role) {
@@ -116,7 +116,7 @@ function redirectByRole(role) {
     if (role === 'seller') {
         window.location.href = 'dashboard.html';
     } else {
-        window.location.href = 'index.html';
+        window.location.href = 'buyer-dashboard.html';
     }
 }
 
@@ -269,7 +269,7 @@ loginForm.addEventListener('submit', function (event) {
         return;
     }
 
-    localStorage.setItem(ACCOUNT_TYPE_KEY, user.role);
+    localStorage.setItem(accountTypeKey, user.role);
     saveSession(user);
     setMessage(loginMessage, 'Bienvenido, ' + user.firstName + '. Redirigiendo...', 'success');
 

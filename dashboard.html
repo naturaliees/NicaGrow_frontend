@@ -1,171 +1,295 @@
 <!DOCTYPE html>
 <html lang="es">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Panel del vendedor | NicaGrow</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@200..800&display=swap"
-            rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/styles.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del vendedor | NicaGrow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@200..800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
 
-    <body class="seller-dashboard-page">
+<body class="seller-dashboard-page">
 
-        <main class="seller-dashboard py-4 py-lg-5">
+    <main class="seller-dashboard py-4 py-lg-5">
 
-            <div class="container-fluid px-3 px-lg-4">
-                <section class="dashboard-shell">
-                    <!-- barra de navegacion del vendedor -->
-                    <nav class="navbar navbar-expand-lg seller-navbar navbar-light">
-                        <div class="container-fluid px-0">
-                            <a class="navbar-brand seller-brand" href="index.html">NicaGrow<span>.</span></a>
-                            <button class="navbar-toggler seller-toggler" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#sellerNavLeft" aria-controls="sellerNavLeft" aria-expanded="false"
-                                aria-label="Abrir navegación">
-                                <span class="navbar-toggler-icon"></span>
-                            </button>
-                            <div class="collapse navbar-collapse" id="sellerNavLeft">
-                                <ul class="navbar-nav me-auto mb-3 mb-lg-0 seller-nav-links">
-                                    <li class="nav-item"><button class="nav-link active" type="button"
-                                            data-dashboard-view="overview">Panel de ventas</button></li>
-                                    <li class="nav-item"><button class="nav-link" type="button"
-                                            data-dashboard-view="products">Mis productos</button></li>
-                                    <li class="nav-item"><button class="nav-link" type="button"
-                                            data-dashboard-view="sales">Historial de ventas</button></li>
-                                </ul>
-                                <div class="seller-top-icons">
-                                    <span class="seller-session-pill" id="sellerSessionName">Vendedor</span>
-                                    <button type="button" class="seller-logout-btn" id="logoutButton">Cerrar sesión</button>
-                                </div>
+        <div class="container-fluid px-3 px-lg-4">
+            <section class="dashboard-shell">
+                <!-- barra de navegacion del vendedor -->
+                <nav class="navbar navbar-expand-lg seller-navbar navbar-light">
+                    <div class="container-fluid px-0">
+                        <a class="navbar-brand seller-brand" href="index.html">NicaGrow<span>.</span></a>
+                        <button class="navbar-toggler seller-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#sellerNavLeft" aria-controls="sellerNavLeft" aria-expanded="false"
+                            aria-label="Abrir navegación">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="sellerNavLeft">
+                            <ul class="navbar-nav me-auto mb-3 mb-lg-0 seller-nav-links">
+                                <li class="nav-item"><button class="nav-link active" type="button"
+                                        data-dashboard-view="overview">Panel de ventas</button></li>
+                                <li class="nav-item"><button class="nav-link" type="button"
+                                        data-dashboard-view="products">Mis productos</button></li>
+                                <li class="nav-item"><button class="nav-link" type="button"
+                                        data-dashboard-view="sales">Historial de ventas</button></li>
+                            </ul>
+                            <div class="seller-top-icons">
+                                <button type="button" class="seller-profile-icon" id="profileButton"
+                                    aria-label="Abrir perfil"><i class="fas fa-user"></i></button>
+                                <span class="seller-session-pill" id="sellerSessionName">Vendedor</span>
+                                <button type="button" class="seller-logout-btn" id="logoutButton">Cerrar sesión</button>
                             </div>
                         </div>
-                    </nav>
+                    </div>
+                </nav>
 
-                    <!-- vista principal con el resumen rapido del negocio -->
-                    <section class="dashboard-view active" id="overviewView">
-                        <div class="row g-3 seller-stats text-center">
-                            <div class="col-md-4">
-                                <div class="seller-stat-card">
-                                    <span>Productos</span>
-                                    <strong id="totalProducts">0</strong>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="seller-stat-card">
-                                    <span>Ventas</span>
-                                    <strong id="totalSales">0</strong>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="seller-stat-card">
-                                    <span>Ingresos</span>
-                                    <strong id="totalRevenue">C$0</strong>
-                                </div>
+                <!-- vista principal con el resumen rapido del negocio -->
+                <section class="dashboard-view active" id="overviewView">
+                    <div class="row g-3 seller-stats text-center">
+                        <div class="col-md-4">
+                            <div class="seller-stat-card">
+                                <span>Productos</span>
+                                <strong id="totalProducts">0</strong>
                             </div>
                         </div>
-
-                        <div class="row g-3 g-lg-4 mt-2">
-                            <div class="col-lg-7">
-                                <div class="seller-panel">
-                                    <h2 class="seller-section-title">Productos recientes</h2>
-                                    <div class="row g-3" id="overviewProducts"></div>
-                                </div>
-                            </div>
-                            <div class="col-lg-5">
-                                <div class="seller-panel">
-                                    <h2 class="seller-section-title">Resumen de ventas</h2>
-                                    <div class="seller-chart" id="overviewSalesChart"></div>
-                                </div>
+                        <div class="col-md-4">
+                            <div class="seller-stat-card">
+                                <span>Ventas</span>
+                                <strong id="totalSales">0</strong>
                             </div>
                         </div>
-                    </section>
-
-                    <!-- vista para revisar y publicar productos -->
-                    <section class="dashboard-view" id="productsView">
-                        <div class="seller-section-header">
-                            <h2 class="seller-section-title">Mis Productos</h2>
-                            <span id="productCountLabel">0 productos publicados</span>
-                        </div>
-
-                        <div class="seller-product-layout">
-                            <form class="seller-product-form" id="productForm">
-                                <h3>Publicar producto</h3>
-                                <div class="form-message" id="productMessage" aria-live="polite"></div>
-
-                                <input id="productName" name="name" type="text" placeholder="Nombre del producto" required>
-                                <textarea id="productDescription" name="description" placeholder="Descripción"
-                                    required></textarea>
-                                <div class="seller-form-row">
-                                    <input id="productPrice" name="price" type="number" min="1" placeholder="Precio C$"
-                                        required>
-                                    <input id="productStock" name="stock" type="number" min="1" placeholder="Stock"
-                                        required>
-                                </div>
-                                <input id="productImage" name="image" type="url"
-                                    placeholder="URL externa de imagen (opcional)">
-
-                                <button type="submit" class="seller-submit-btn">Publicar</button>
-                            </form>
-
-                            <div class="row g-3 g-lg-4" id="productsGrid"></div>
-                        </div>
-                    </section>
-
-                    <!-- vista para mirar ventas y datos simples de rendimiento -->
-                    <section class="dashboard-view" id="salesView">
-                        <div class="row g-3 seller-stats text-center">
-                            <div class="col-md-4">
-                                <div class="seller-stat-card">
-                                    <span>Ventas entregadas</span>
-                                    <strong id="deliveredSales">0</strong>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="seller-stat-card">
-                                    <span>Ventas pendientes</span>
-                                    <strong id="pendingSales">0</strong>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="seller-stat-card">
-                                    <span>Ticket promedio</span>
-                                    <strong id="averageSale">C$0</strong>
-                                </div>
+                        <div class="col-md-4">
+                            <div class="seller-stat-card">
+                                <span>Ingresos</span>
+                                <strong id="totalRevenue">C$0</strong>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="seller-panel mt-4">
-                            <h2 class="seller-section-title">Estadística de ventas por producto</h2>
-                            <div class="seller-chart" id="salesChart"></div>
+                    <div class="row g-3 g-lg-4 mt-2">
+                        <div class="col-lg-7">
+                            <div class="seller-panel">
+                                <h2 class="seller-section-title">Productos recientes</h2>
+                                <div class="row g-3" id="overviewProducts"></div>
+                            </div>
                         </div>
-
-                        <div class="table-responsive seller-history-wrap mt-4">
-                            <table class="table admin-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Cliente</th>
-                                        <th>Fecha</th>
-                                        <th>Estado</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="salesTableBody"></tbody>
-                            </table>
+                        <div class="col-lg-5">
+                            <div class="seller-panel">
+                                <h2 class="seller-section-title">Resumen de ventas</h2>
+                                <div class="seller-chart" id="overviewSalesChart"></div>
+                            </div>
                         </div>
-                    </section>
+                    </div>
                 </section>
-            </div>
 
-        </main>
+                <!-- vista para revisar y publicar productos -->
+                <section class="dashboard-view" id="productsView">
+                    <div class="seller-section-header">
+                        <h2 class="seller-section-title">Mis Productos</h2>
+                        <span id="productCountLabel">0 productos publicados</span>
+                    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="js/dashboard.js"></script>
-    </body>
+                    <div class="seller-product-layout">
+                        <form class="seller-product-form" id="productForm">
+                            <h3 id="productFormTitle">Publicar producto</h3>
+                            <div class="form-message" id="productMessage" aria-live="polite"></div>
+
+                            <input id="productName" name="name" type="text" placeholder="Nombre del producto" required>
+                            <textarea id="productDescription" name="description" placeholder="Descripción"
+                                required></textarea>
+                            <select id="productCategory" name="category" required>
+                                <option value="">Selecciona una categoria</option>
+                                <option value="Artesanias Tradicionales">Artesanias Tradicionales</option>
+                                <option value="Bisuteria Hecha a Mano">Bisuteria Hecha a Mano</option>
+                                <option value="Cacao y Cafe Artesanal">Cacao y Cafe Artesanal</option>
+                                <option value="Ceramica de Barro">Ceramica de Barro</option>
+                                <option value="Cuero Artesanal">Cuero Artesanal</option>
+                                <option value="Decoracion Tipica">Decoracion Tipica</option>
+                                <option value="Hogar y Bambú">Hogar y Bambú</option>
+                                <option value="Productos Ecologicos">Productos Ecologicos</option>
+                                <option value="Souvenirs Nacionales">Souvenirs Nacionales</option>
+                                <option value="Textiles Nicaraguenses">Textiles Nicaraguenses</option>
+                            </select>
+                            <div class="seller-form-row">
+                                <input id="productPrice" name="price" type="number" min="1" placeholder="Precio C$"
+                                    required>
+                                <input id="productStock" name="stock" type="number" min="1" placeholder="Stock"
+                                    required>
+                            </div>
+                            <input id="productImage" name="image" type="url"
+                                placeholder="URL externa de imagen (opcional)">
+
+                            <button type="submit" class="seller-submit-btn" id="productSubmitBtn">Publicar</button>
+                            <button type="button" class="seller-cancel-btn" id="cancelEditBtn">Cancelar edicion</button>
+                        </form>
+
+                        <div class="row g-3 g-lg-4" id="productsGrid"></div>
+                    </div>
+                </section>
+
+                <!-- vista para mirar ventas y datos simples de rendimiento -->
+                <section class="dashboard-view" id="salesView">
+                    <div class="row g-3 seller-stats text-center">
+                        <div class="col-md-4">
+                            <div class="seller-stat-card">
+                                <span>Ventas entregadas</span>
+                                <strong id="deliveredSales">0</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="seller-stat-card">
+                                <span>Ventas pendientes</span>
+                                <strong id="pendingSales">0</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="seller-stat-card">
+                                <span>Ticket promedio</span>
+                                <strong id="averageSale">C$0</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="seller-panel mt-4">
+                        <h2 class="seller-section-title">Estadística de ventas por producto</h2>
+                        <div class="seller-chart" id="salesChart"></div>
+                    </div>
+
+                    <div class="table-responsive seller-history-wrap mt-4">
+                        <table class="table admin-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cliente</th>
+                                    <th>Contacto</th>
+                                    <th>Cantidad</th>
+                                    <th>Estado</th>
+                                    <th>Total</th>
+                                    <th>Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- modal para revisar y actualizar una venta -->
+                <div class="seller-profile-modal" id="saleModal">
+                    <div class="seller-profile-screen">
+                        <div class="seller-profile-titlebar">
+                            <h2>Detalle de venta</h2>
+                            <button type="button" id="closeSaleModalBtn" aria-label="Cerrar venta">&times;</button>
+                        </div>
+
+                        <section class="seller-profile-summary">
+                            <div class="seller-profile-photo">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+
+                            <div class="seller-profile-main-info">
+                                <h3 id="saleDetailProduct">Producto</h3>
+                                <p id="saleDetailCustomer">Cliente</p>
+                            </div>
+
+                            <div class="seller-profile-followers">
+                                <strong id="saleDetailTotal">C$0</strong>
+                                <span>total</span>
+                            </div>
+                        </section>
+
+                        <section class="seller-profile-edit-panel sale-detail-panel">
+                            <div class="seller-profile-edit-header">
+                                <h3>Informacion de la compra</h3>
+                            </div>
+
+                            <div class="sale-detail-grid">
+                                <div><span>Correo</span><strong id="saleDetailEmail">correo@nicagrow.com</strong></div>
+                                <div><span>Telefono</span><strong id="saleDetailPhone">+505 0000 0000</strong></div>
+                                <div><span>Cantidad</span><strong id="saleDetailQuantity">1</strong></div>
+                                <div><span>Metodo de pago</span><strong id="saleDetailPayment">Pago contra entrega</strong></div>
+                                <div><span>Metodo de envio</span><strong id="saleDetailShipping">Cargotrans</strong></div>
+                                <div><span>Direccion de envio</span><strong id="saleDetailAddress">Nicaragua</strong></div>
+                            </div>
+
+                            <label class="sale-status-label" for="saleStatusSelect">Estado de la venta</label>
+                            <select id="saleStatusSelect">
+                                <option value="pendiente">Pendiente</option>
+                                <option value="preparando">Preparando</option>
+                                <option value="enviada">Enviada</option>
+                                <option value="entregada">Entregada</option>
+                            </select>
+
+                            <button type="button" class="seller-submit-btn" id="saveSaleStatusBtn">Guardar estado</button>
+                            <div class="form-message" id="saleMessage" aria-live="polite"></div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- modal para ver y editar la informacion del vendedor -->
+                <div class="seller-profile-modal" id="profileModal">
+                    <div class="seller-profile-screen">
+                        <div class="seller-profile-titlebar">
+                            <h2>Perfil de vendedor</h2>
+                            <button type="button" id="closeProfileBtn" aria-label="Cerrar perfil">&times;</button>
+                        </div>
+
+                        <section class="seller-profile-summary">
+                            <div class="seller-profile-photo">
+                                <i class="fas fa-user"></i>
+                            </div>
+
+                            <div class="seller-profile-main-info">
+                                <h3 id="profileDisplayName">Vendedor</h3>
+                                <p id="profileBusinessName">Nombre del negocio</p>
+                            </div>
+
+                            <div class="seller-profile-followers">
+                                <strong id="profileFollowersCount">128</strong>
+                                <span>seguidores</span>
+                            </div>
+                        </section>
+
+                        <section class="seller-profile-edit-panel">
+                            <div class="seller-profile-edit-header">
+                                <h3>Editar perfil</h3>
+                                <p>Actualiza la informacion que usas como vendedor.</p>
+                            </div>
+
+                            <form id="profileForm" class="seller-profile-form">
+                                <div class="form-message" id="profileMessage" aria-live="polite"></div>
+
+                                <div class="seller-form-row">
+                                    <input id="profileFirstName" type="text" placeholder="Nombre" required>
+                                    <input id="profileLastName" type="text" placeholder="Apellidos" required>
+                                </div>
+
+                                <input id="profileBusinessInput" type="text" placeholder="Nombre del negocio">
+                                <input id="profileEmail" type="email" placeholder="Correo electronico" required>
+
+                                <div class="seller-form-row">
+                                    <input id="profileBirthDate" type="date" required>
+                                    <input id="profilePhone" type="tel" placeholder="Numero telefonico" required>
+                                </div>
+
+                                <input id="profileCity" type="text" placeholder="Ciudad" required>
+
+                                <button type="submit" class="seller-submit-btn">Guardar perfil</button>
+                            </form>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
 
 </html>

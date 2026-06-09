@@ -31,12 +31,14 @@ body{
     justify-content:center;
     align-items:center;
     min-height:100vh;
+    overflow-x:hidden;
 }
 
 /* pantalla previa donde se elige comprador o vendedor */
 .account-type-page{
     background:linear-gradient(90deg, #fff, var(--azul));
     padding:24px;
+    overflow-y:auto;
 }
 
 /* contenedor de la pantalla para escoger tipo de cuenta */
@@ -221,17 +223,21 @@ form p{
 
 .input-box input{
     width:100%;
+    min-height:48px;
     padding:13px 50px 13px 20px;
     background:#fff;
     border-radius:8px;
     font-size:16px;
+    line-height:1.2;
     color:var(--negro);
+    -webkit-text-fill-color:var(--negro);
     font-weight:500;
     border:1px solid transparent;
 }
 
 .input-box input::placeholder{
     color:var(--negro);
+    opacity:.72;
     font-weight:400;
 }
 
@@ -276,24 +282,6 @@ form p{
 .btn:hover{
     background:var(--amarillo);
     color:var(--negro);
-}
-
-/* botones sociales del formulario */
-.social-icons{
-    display:flex;
-    justify-content:center;
-    margin-top:8px;
-}
-
-.social-icons a{
-    display:inline-flex;
-    padding:10px;
-    border:1px solid rgba(25, 25, 29, 0.12);
-    border-radius:8px;
-    font-size:24px;
-    color:var(--negro);
-    margin:0 8px;
-    background:#fff;
 }
 
 /* selector de rol dentro del registro */
@@ -470,15 +458,26 @@ form p{
 
 /* ajustes para pantallas pequenas */
 @media screen and (max-width: 650px){
+    body{
+        align-items:flex-start;
+        padding:12px;
+    }
+
     .container{
-        min-height:calc(100vh - 40px);
+        width:100%;
+        min-height:calc(100vh - 24px);
+        margin:0;
+        border-radius:22px;
     }
 
     .form-box{
         bottom:0;
         width:100%;
         height:72%;
-        padding:28px 20px;
+        align-items:flex-start;
+        padding:24px 20px;
+        overflow-y:auto;
+        -webkit-overflow-scrolling:touch;
     }
 
     .container.active .form-box{
@@ -528,6 +527,28 @@ form p{
         grid-template-columns:1fr;
     }
 
+    .role-selector{
+        gap:10px;
+        margin:16px 0 10px;
+    }
+
+    .role-card{
+        min-height:auto;
+        padding:16px;
+    }
+
+    .role-card i{
+        margin-bottom:10px;
+    }
+
+    .role-card small{
+        line-height:1.35;
+    }
+
+    .input-box{
+        margin:12px 0;
+    }
+
     .full-width{
         grid-column:span 1;
     }
@@ -538,6 +559,10 @@ form p{
     .account-type-page{
         padding:16px;
         align-items:flex-start;
+    }
+
+    .account-type-shell{
+        width:100%;
     }
 
     .account-type-panel{
@@ -557,16 +582,69 @@ form p{
 
 /* ajustes finales para telefonos muy pequenos */
 @media screen and (max-width: 400px){
+    body{
+        padding:8px;
+    }
+
     .form-box{
-        padding:18px;
+        height:74%;
+        padding:16px;
+    }
+
+    .container.active .form-box{
+        bottom:26%;
+    }
+
+    .container.active .toggle-box::before{
+        top:74%;
+    }
+
+    .toggle-panel{
+        height:26%;
+    }
+
+    .container.active .toggle-panel.toggle-left{
+        top:-26%;
     }
 
     .toggle-panel h1,
     h1{
-        font-size:30px;
+        font-size:26px;
+    }
+
+    .form-subtitle,
+    .selected-role-text,
+    .login-container p,
+    form p{
+        font-size:13px;
+    }
+
+    .input-box input{
+        min-height:46px;
+        font-size:15px;
+        padding:12px 44px 12px 14px;
+    }
+
+    .input-box i{
+        right:14px;
+        font-size:18px;
+    }
+
+    .btn{
+        height:46px;
+        font-size:15px;
     }
 
     .role-card{
         min-height:auto;
+        padding:14px;
+    }
+
+    .role-card span{
+        font-size:16px;
+    }
+
+    .role-card small{
+        font-size:12px;
     }
 }
