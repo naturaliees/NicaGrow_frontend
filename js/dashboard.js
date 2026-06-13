@@ -1,202 +1,105 @@
 const sessionKey = 'nicagrowCurrentUser';
-const usersKey = 'nicagrowUsers';
-const productsKey = 'nicagrowSellerProducts';
-const salesKey = 'nicagrowSellerSales';
-const purchasesKey = 'nicagrowBuyerPurchases';
 
-// toma la sesion que se guardo al iniciar o crear cuenta
+// datos basicos de sesion y formato
 function getCurrentUser() {
-    try {
-        return JSON.parse(localStorage.getItem(sessionKey));
-    } catch {
-        return null;
-    }
-}
-
-// lee cualquier lista guardada sin romper la pagina si algo sale mal
-function getStoredItems(key) {
-    try {
-        const data = JSON.parse(localStorage.getItem(key));
-
-        if (data) {
-            return data;
-        }
-
-        return [];
-    } catch {
-        return [];
-    }
-}
-
-function saveStoredItems(key, items) {
-    localStorage.setItem(key, JSON.stringify(items));
+    return NicaGrowApi.getSession();
 }
 
 function saveSession(user) {
     localStorage.setItem(sessionKey, JSON.stringify(user));
 }
 
-// deja los montos en el formato que se muestra en el panel
 function formatCurrency(value) {
-    const numberValue = Number(value || 0);
-    return 'C$' + numberValue.toLocaleString('es-NI');
+    return 'C$' + Number(value || 0).toLocaleString('es-NI');
 }
 
-// limpia texto escrito por usuarios
 function escapeHtml(value) {
     let text = String(value || '');
-
     text = text.split('&').join('&amp;');
     text = text.split('<').join('&lt;');
     text = text.split('>').join('&gt;');
     text = text.split('"').join('&quot;');
     text = text.split("'").join('&#039;');
-
     return text;
 }
 
-// formato para subir imagenes
-function getExternalImage(image) {
-    const value = String(image || '').trim();
+// prepara imagenes que vienen como url o como archivo convertido a base64
+function getProductImage(product) {
+    if (product.FotoUrl) {
+        return product.FotoUrl;
+    }
 
-    if (value.indexOf('http://') === 0 || value.indexOf('https://') === 0) {
-        return value;
+    if (product.FotoBase64) {
+        if (String(product.FotoBase64).indexOf('data:image') === 0) {
+            return product.FotoBase64;
+        }
+
+        return 'data:image/jpeg;base64,' + product.FotoBase64;
     }
 
     return '';
 }
 
-function getSampleProducts(sellerId) {
-    const products = [];
-
-    products.push({
-        id: Date.now(),
-        sellerId: sellerId,
-        name: 'Camisa típica',
-        description: 'Camisa de traje típico tejida a mano.',
-        category: 'Textiles Nicaraguenses',
-        price: 500,
-        stock: 8,
-        image: 'images/9e12520ad2012a0d5ca709c4197e8dff.jpg',
-        isLocalSample: true
-    });
-
-    products.push({
-        id: Date.now() + 1,
-        sellerId: sellerId,
-        name: 'Bolso tejido',
-        description: 'Diseño artesanal resistente.',
-        category: 'Artesanias Tradicionales',
-        price: 200,
-        stock: 12,
-        image: 'images/65283311-accesorios-de-moda-femenina-y-de-diversos-artículos-de-bolsos-de-estilo-cubo-de-punto-mochilas.jpg',
-        isLocalSample: true
-    });
-
-    return products;
-}
-
-function getSampleSales(sellerId) {
-    const sales = [];
-
-    sales.push({
-        id: Date.now(),
-        sellerId: sellerId,
-        productName: 'Camisa típica',
-        customer: 'María López',
-        date: '12/04/2026',
-        status: 'Entregado',
-        total: 500
-    });
-
-    sales.push({
-        id: Date.now() + 1,
-        sellerId: sellerId,
-        productName: 'Bolso tejido',
-        customer: 'Carlos Ruiz',
-        date: '10/04/2026',
-        status: 'Pendiente',
-        total: 200
-    });
-
-    sales.push({
-        id: Date.now() + 2,
-        sellerId: sellerId,
-        productName: 'Camisa típica',
-        customer: 'Ana Mendoza',
-        date: '08/04/2026',
-        status: 'Entregado',
-        total: 500
-    });
-
-    return sales;
-}
-
-function getSellerItems(items, sellerId) {
-    const sellerItems = [];
-
-    for (let i = 0; i < items.length; i++) {
-        if (items[i].sellerId === sellerId) {
-            sellerItems.push(items[i]);
-        }
-    }
-
-    return sellerItems;
-}
-
-// agrega datos de ejemplo para que el dashboard no aparezca vacio al inicio
-function seedSellerData(sellerId) {
-    const products = getStoredItems(productsKey);
-    const sellerProducts = getSellerItems(products, sellerId);
-    const sampleProducts = getSampleProducts(sellerId);
-
-    if (sellerProducts.length === 0) {
-        for (let i = 0; i < sampleProducts.length; i++) {
-            products.push(sampleProducts[i]);
+// convierte una imagen del dispositivo en texto para enviarla al backend
+function readImageFile(file) {
+    return new Promise(function (resolve, reject) {
+        if (!file) {
+            resolve('');
+            return;
         }
 
-        saveStoredItems(productsKey, products);
-    } else {
-        for (let i = 0; i < products.length; i++) {
-            for (let j = 0; j < sampleProducts.length; j++) {
-                const isSameSeller = products[i].sellerId === sellerId;
-                const isSameProduct = products[i].name === sampleProducts[j].name;
+        const reader = new FileReader();
 
-            if (isSameSeller && isSameProduct && !products[i].image) {
-                products[i].image = sampleProducts[j].image;
-                products[i].isLocalSample = true;
-            }
+        reader.onload = function () {
+            const result = String(reader.result || '');
+            resolve(result);
+        };
 
-            if (isSameSeller && isSameProduct && !products[i].category) {
-                products[i].category = sampleProducts[j].category;
-            }
-        }
-    }
+        reader.onerror = function () {
+            reject(new Error('No se pudo leer la imagen.'));
+        };
 
-        saveStoredItems(productsKey, products);
-    }
-
-    const sales = getStoredItems(salesKey);
-    const sellerSales = getSellerItems(sales, sellerId);
-    const sampleSales = getSampleSales(sellerId);
-
-    if (sellerSales.length === 0) {
-        for (let i = 0; i < sampleSales.length; i++) {
-            sales.push(sampleSales[i]);
-        }
-
-        saveStoredItems(salesKey, sales);
-    }
+        reader.readAsDataURL(file);
+    });
 }
 
-// si no hay un vendedor logueado, se regresa al flujo de seleccion de cuenta
+// normaliza los estados para mostrarlos igual en toda la vista
+function getStatusLabel(status) {
+    const value = String(status || 'pendiente').toLowerCase();
+
+    if (value === 'entregado') {
+        return 'entregada';
+    }
+
+    return value;
+}
+
+// escoge el color del estado dentro de las tablas
+function getStatusBadge(status) {
+    const value = getStatusLabel(status);
+
+    if (value === 'entregada') {
+        return 'bg-success';
+    }
+
+    if (value === 'enviada') {
+        return 'bg-primary';
+    }
+
+    if (value === 'preparando') {
+        return 'bg-info text-dark';
+    }
+
+    return 'bg-warning text-dark';
+}
+
 const currentUser = getCurrentUser();
 
+// protege el dashboard para que solo entren vendedores
 if (!currentUser || currentUser.role !== 'seller') {
     window.location.href = 'account-type.html';
 } else {
-    seedSellerData(currentUser.id);
-
+    // referencias de la interfaz del vendedor
     const sellerSessionName = document.getElementById('sellerSessionName');
     const logoutButton = document.getElementById('logoutButton');
     const navButtons = document.querySelectorAll('[data-dashboard-view]');
@@ -218,194 +121,112 @@ if (!currentUser || currentUser.role !== 'seller') {
     const saveSaleStatusBtn = document.getElementById('saveSaleStatusBtn');
     const saleStatusSelect = document.getElementById('saleStatusSelect');
     const saleMessage = document.getElementById('saleMessage');
+    const productCategory = document.getElementById('productCategory');
+
     let editingProductId = null;
-    let activeSaleId = null;
+    let activeSale = null;
+    let categories = [];
+    let productsCache = [];
+    let salesCache = [];
 
-    if (sellerSessionName) {
-        sellerSessionName.textContent = currentUser.firstName + ' ' + currentUser.lastName;
-    }
+    sellerSessionName.textContent = currentUser.firstName + ' ' + currentUser.lastName;
 
-    function getSellerProducts() {
-        const allProducts = getStoredItems(productsKey);
-        return getSellerItems(allProducts, currentUser.id);
-    }
-
-    // busca los datos del comprador para mostrar contacto en ventas
-    function getBuyerById(buyerId) {
-        const users = getStoredItems(usersKey);
-
-        for (let i = 0; i < users.length; i++) {
-            if (String(users[i].id) === String(buyerId)) {
-                return users[i];
-            }
-        }
-
-        return null;
-    }
-
-    // normaliza estados para que comprador y vendedor lean lo mismo
-    function getStatusLabel(status) {
-        const value = String(status || 'pendiente').toLowerCase();
-
-        if (value === 'entregado') {
-            return 'entregada';
-        }
-
-        return value;
-    }
-
-    // elige el color del estado en la tabla del vendedor
-    function getStatusBadge(status) {
-        const value = getStatusLabel(status);
-
-        if (value === 'entregada') {
-            return 'bg-success';
-        }
-
-        if (value === 'enviada') {
-            return 'bg-primary';
-        }
-
-        if (value === 'preparando') {
-            return 'bg-info text-dark';
-        }
-
-        return 'bg-warning text-dark';
-    }
-
-    // toma contacto guardado en la compra o lo busca en usuarios
-    function getPurchaseCustomer(purchase) {
-        const buyer = getBuyerById(purchase.buyerId);
-
-        if (purchase.buyer) {
-            return purchase.buyer;
-        }
-
-        if (buyer) {
-            return {
-                name: buyer.firstName + ' ' + buyer.lastName,
-                email: buyer.email || 'correo@nicagrow.com',
-                phone: buyer.phone || '+505 9999 0000',
-                city: buyer.city || 'Nicaragua'
-            };
-        }
-
-        return {
-            name: 'Cliente',
-            email: 'correo@nicagrow.com',
-            phone: '+505 9999 0000',
-            city: 'Nicaragua'
-        };
-    }
-
-    // convierte una compra del cliente en una venta para el vendedor
-    function getSaleFromPurchase(purchase) {
-        const customer = getPurchaseCustomer(purchase);
-        const productTotal = Number(purchase.product.price || 0) * Number(purchase.quantity || 1);
-
-        return {
-            id: purchase.id,
-            purchaseId: purchase.id,
-            sellerId: purchase.product.sellerId,
-            productName: purchase.product.name,
-            customer: customer.name,
-            customerEmail: customer.email,
-            customerPhone: customer.phone,
-            customerCity: customer.city,
-            quantity: purchase.quantity || 1,
-            status: getStatusLabel(purchase.status),
-            total: productTotal + Number(purchase.shippingCost || 0),
-            paymentMethod: purchase.paymentMethod || 'Pago contra entrega',
-            shipping: purchase.shipping || 'Cargotrans',
-            address: purchase.address || 'Nicaragua',
-            source: 'purchase'
-        };
-    }
-
-    // junta las ventas reales y deja ejemplos si aun no hay compras
-    function getSellerSales() {
-        const purchases = getStoredItems(purchasesKey);
-        const sales = [];
-
-        for (let i = 0; i < purchases.length; i++) {
-            if (purchases[i].product && purchases[i].product.sellerId === currentUser.id) {
-                sales.push(getSaleFromPurchase(purchases[i]));
-            }
-        }
-
-        if (sales.length === 0) {
-            const sampleSales = getSellerItems(getStoredItems(salesKey), currentUser.id);
-
-            for (let i = 0; i < sampleSales.length; i++) {
-                sampleSales[i].quantity = sampleSales[i].quantity || 1;
-                sampleSales[i].customerEmail = sampleSales[i].customerEmail || 'cliente@nicagrow.com';
-                sampleSales[i].customerPhone = sampleSales[i].customerPhone || '+505 8888 0000';
-                sampleSales[i].paymentMethod = sampleSales[i].paymentMethod || 'Pago contra entrega';
-                sampleSales[i].shipping = sampleSales[i].shipping || 'Cargotrans';
-                sampleSales[i].address = sampleSales[i].address || 'Managua, Nicaragua';
-                sampleSales[i].status = getStatusLabel(sampleSales[i].status);
-                sampleSales[i].source = 'sample';
-                sales.push(sampleSales[i]);
-            }
-        }
-
-        return sales;
-    }
-
-    // cambia entre panel, productos e historial sin salir del dashboard
+    // cambia entre panel, productos y ventas
     function setDashboardView(viewName) {
         for (let i = 0; i < navButtons.length; i++) {
-            if (navButtons[i].dataset.dashboardView === viewName) {
-                navButtons[i].classList.add('active');
-            } else {
-                navButtons[i].classList.remove('active');
-            }
+            navButtons[i].classList.toggle('active', navButtons[i].dataset.dashboardView === viewName);
         }
 
         for (let i = 0; i < dashboardViews.length; i++) {
-            if (dashboardViews[i].id === viewName + 'View') {
-                dashboardViews[i].classList.add('active');
-            } else {
-                dashboardViews[i].classList.remove('active');
-            }
+            dashboardViews[i].classList.toggle('active', dashboardViews[i].id === viewName + 'View');
         }
     }
 
-    // arma una tarjeta de producto reutilizable para las dos vistas
-    function buildProductCard(product) {
-        let image = '';
+    // mensajes pequenos para formularios y modales
+    function setProductMessage(message, type) {
+        productMessage.textContent = message;
+        productMessage.classList.toggle('error', type === 'error');
+    }
 
-        if (product.isLocalSample) {
-            image = product.image;
-        } else {
-            image = getExternalImage(product.image);
+    function setProfileMessage(message, type) {
+        profileMessage.textContent = message;
+        profileMessage.classList.toggle('error', type === 'error');
+    }
+
+    function setSaleMessage(message, type) {
+        saleMessage.textContent = message;
+        saleMessage.classList.toggle('error', type === 'error');
+    }
+
+    // busca el nombre visible de una categoria
+    function categoryName(id) {
+        const category = categories.find(function (item) {
+            return String(item.Id) === String(id);
+        });
+
+        return category ? category.Categoria : 'Sin categoria';
+    }
+
+    // carga las categorias necesarias para publicar productos
+    async function loadCategories() {
+        const defaultCategories = [
+            'Artesanias Tradicionales',
+            'Bisuteria Hecha a Mano',
+            'Cacao y Cafe Artesanal',
+            'Ceramica de Barro',
+            'Cuero Artesanal',
+            'Decoracion Tipica',
+            'Hogar y Bambu',
+            'Productos Ecologicos',
+            'Souvenirs Nacionales',
+            'Textiles Nicaraguenses'
+        ];
+
+        categories = await NicaGrowApi.list('/categorias/');
+
+        if (categories.length === 0) {
+            for (let i = 0; i < defaultCategories.length; i++) {
+                await NicaGrowApi.getCategoria(defaultCategories[i]);
+            }
+
+            categories = await NicaGrowApi.list('/categorias/');
         }
 
-        let productMedia = '<div class="seller-product-placeholder">sin imagen</div>';
+        let html = '<option value="">Selecciona una categoria</option>';
+
+        for (let i = 0; i < categories.length; i++) {
+            html += '<option value="' + escapeHtml(categories[i].Id) + '">' + escapeHtml(categories[i].Categoria) + '</option>';
+        }
+
+        productCategory.innerHTML = html;
+    }
+
+    // crea la tarjeta visual de un producto del vendedor
+    function buildProductCard(product) {
+        const image = getProductImage(product);
+        let productMedia = '<div class="seller-product-placeholder">sin foto</div>';
+        let html = '';
 
         if (image) {
-            productMedia = '<img src="' + escapeHtml(image) + '" class="card-img-top" alt="' + escapeHtml(product.name) + '">';
+            productMedia = '<img src="' + escapeHtml(image) + '" class="card-img-top" alt="' + escapeHtml(product.NombreProducto) + '">';
         }
 
-        let html = '';
         html += '<div class="col-md-6 col-xl-4">';
         html += '<article class="card seller-product-card h-100">';
         html += productMedia;
         html += '<div class="card-body">';
-        html += '<h3 class="card-title">' + escapeHtml(product.name) + '</h3>';
-        html += '<span class="seller-category">' + escapeHtml(product.category || 'Sin categoria') + '</span>';
-        html += '<p class="card-text">' + escapeHtml(product.description) + '</p>';
-        html += '<p class="text-price">' + formatCurrency(product.price) + '</p>';
-        html += '<span class="seller-stock">Stock: ' + escapeHtml(product.stock) + '</span>';
-        html += '<button type="button" class="seller-edit-product-btn" data-product-id="' + escapeHtml(product.id) + '">Editar</button>';
+        html += '<h3 class="card-title">' + escapeHtml(product.NombreProducto) + '</h3>';
+        html += '<span class="seller-category">' + escapeHtml(categoryName(product.IdCategoria)) + '</span>';
+        html += '<p class="card-text">Producto publicado en NicaGrow.</p>';
+        html += '<p class="text-price">' + formatCurrency(product.Precio) + '</p>';
+        html += '<span class="seller-stock">Stock: ' + escapeHtml(product.Stock) + '</span>';
+        html += '<button type="button" class="seller-edit-product-btn" data-product-id="' + escapeHtml(product.Id) + '">Editar</button>';
         html += '</div>';
         html += '</article>';
         html += '</div>';
-
         return html;
     }
 
-    // pinta los productos del vendedor y actualiza el contador
     function renderProducts(products) {
         const productsGrid = document.getElementById('productsGrid');
         const overviewProducts = document.getElementById('overviewProducts');
@@ -421,87 +242,57 @@ if (!currentUser || currentUser.role !== 'seller') {
             }
         }
 
-        if (productsGrid) {
-            productsGrid.innerHTML = productsHtml;
+        if (!productsHtml) {
+            productsHtml = '<div class="col-12"><p class="buyer-empty">Todavia no tienes productos publicados.</p></div>';
         }
 
-        if (overviewProducts) {
-            overviewProducts.innerHTML = overviewHtml;
-        }
-
-        if (productCountLabel) {
-            productCountLabel.textContent = products.length + ' productos publicados';
-        }
+        productsGrid.innerHTML = productsHtml;
+        overviewProducts.innerHTML = overviewHtml || productsHtml;
+        productCountLabel.textContent = products.length + ' productos publicados';
     }
 
-    // llena la tabla del historial con cada venta guardada
+    // pinta el historial de ventas del vendedor
     function renderSalesTable(sales) {
         const salesTableBody = document.getElementById('salesTableBody');
-
-        if (!salesTableBody) {
-            return;
-        }
-
         let html = '';
 
         for (let i = 0; i < sales.length; i++) {
-            const badgeClass = getStatusBadge(sales[i].status);
-            const statusLabel = getStatusLabel(sales[i].status);
+            const badgeClass = getStatusBadge(sales[i].Estado);
+            const statusLabel = getStatusLabel(sales[i].Estado);
 
             html += '<tr>';
-            html += '<td>' + escapeHtml(sales[i].productName) + '</td>';
-            html += '<td>' + escapeHtml(sales[i].customer) + '</td>';
-            html += '<td>' + escapeHtml(sales[i].customerPhone || 'Sin telefono') + '</td>';
-            html += '<td>' + escapeHtml(sales[i].quantity || 1) + '</td>';
+            html += '<td>' + escapeHtml(sales[i].NombreProducto) + '</td>';
+            html += '<td>' + escapeHtml(sales[i].Cliente) + '</td>';
+            html += '<td>' + escapeHtml(sales[i].ClienteTelefono || sales[i].ClienteCorreo || 'Sin contacto') + '</td>';
+            html += '<td>' + escapeHtml(sales[i].Cantidad) + '</td>';
             html += '<td><span class="badge ' + badgeClass + '">' + escapeHtml(statusLabel) + '</span></td>';
-            html += '<td>' + formatCurrency(sales[i].total) + '</td>';
-            html += '<td><button type="button" class="seller-sale-detail-btn" data-sale-id="' + escapeHtml(sales[i].id) + '">Ver detalle</button></td>';
+            html += '<td>' + formatCurrency(sales[i].Subtotal) + '</td>';
+            html += '<td><button type="button" class="seller-sale-detail-btn" data-sale-index="' + i + '">Ver detalle</button></td>';
             html += '</tr>';
+        }
+
+        if (!html) {
+            html = '<tr><td colspan="7">Todavia no hay ventas registradas.</td></tr>';
         }
 
         salesTableBody.innerHTML = html;
     }
 
-    // agrupa los ingresos para saber cuanto vendio cada producto
-    function buildSalesByProduct(sales) {
+    // arma una grafica simple con el total vendido por producto
+    function renderSalesChart(containerId, sales) {
+        const container = document.getElementById(containerId);
         const totals = {};
+        let maxValue = 1;
+        let html = '';
 
         for (let i = 0; i < sales.length; i++) {
-            const productName = sales[i].productName;
+            const productName = sales[i].NombreProducto;
+            totals[productName] = (totals[productName] || 0) + Number(sales[i].Subtotal || 0);
 
-            if (!totals[productName]) {
-                totals[productName] = 0;
-            }
-
-            totals[productName] += Number(sales[i].total || 0);
-        }
-
-        return totals;
-    }
-
-    function getMaxSaleValue(totals) {
-        let maxValue = 1;
-
-        for (const productName in totals) {
             if (totals[productName] > maxValue) {
                 maxValue = totals[productName];
             }
         }
-
-        return maxValue;
-    }
-
-    // dibuja barras simples para comparar ventas sin meter librerias
-    function renderSalesChart(containerId, sales) {
-        const container = document.getElementById(containerId);
-
-        if (!container) {
-            return;
-        }
-
-        const totals = buildSalesByProduct(sales);
-        const maxValue = getMaxSaleValue(totals);
-        let html = '';
 
         for (const productName in totals) {
             let width = (totals[productName] / maxValue) * 100;
@@ -515,37 +306,29 @@ if (!currentUser || currentUser.role !== 'seller') {
             html += '<span>' + escapeHtml(productName) + '</span>';
             html += '<strong>' + formatCurrency(totals[productName]) + '</strong>';
             html += '</div>';
-            html += '<div class="seller-chart-track">';
-            html += '<span style="width:' + width + '%"></span>';
-            html += '</div>';
+            html += '<div class="seller-chart-track"><span style="width:' + width + '%"></span></div>';
             html += '</div>';
         }
 
-        container.innerHTML = html;
+        container.innerHTML = html || '<p class="buyer-empty">Sin ventas para graficar.</p>';
     }
 
-    // actualiza las tarjetas numericas del dashboard
+    // actualiza los numeros grandes del resumen
     function renderStats(products, sales) {
         let revenue = 0;
         let delivered = 0;
         let pending = 0;
 
         for (let i = 0; i < sales.length; i++) {
-            revenue += Number(sales[i].total || 0);
+            revenue += Number(sales[i].Subtotal || 0);
 
-            if (getStatusLabel(sales[i].status) === 'entregada') {
+            if (getStatusLabel(sales[i].Estado) === 'entregada') {
                 delivered++;
             }
 
-            if (getStatusLabel(sales[i].status) === 'pendiente') {
+            if (getStatusLabel(sales[i].Estado) === 'pendiente') {
                 pending++;
             }
-        }
-
-        let average = 0;
-
-        if (sales.length > 0) {
-            average = Math.round(revenue / sales.length);
         }
 
         document.getElementById('totalProducts').textContent = products.length;
@@ -553,140 +336,60 @@ if (!currentUser || currentUser.role !== 'seller') {
         document.getElementById('totalRevenue').textContent = formatCurrency(revenue);
         document.getElementById('deliveredSales').textContent = delivered;
         document.getElementById('pendingSales').textContent = pending;
-        document.getElementById('averageSale').textContent = formatCurrency(average);
+        document.getElementById('averageSale').textContent = formatCurrency(sales.length ? Math.round(revenue / sales.length) : 0);
     }
 
-    // refresca todo lo que depende de productos y ventas
-    function renderDashboard() {
-        const products = getSellerProducts();
-        const sales = getSellerSales();
+    // trae productos y ventas desde la api
+    async function loadDashboard() {
+        productsCache = await NicaGrowApi.list('/productos/?vendedor=' + currentUser.id);
+        const allSales = await NicaGrowApi.list('/reportes/detalle-pedidos/');
+        salesCache = allSales.filter(function (sale) {
+            return String(sale.Vendedor).toLowerCase() === String(currentUser.businessName).toLowerCase();
+        });
 
-        renderProducts(products);
-        renderStats(products, sales);
-        renderSalesTable(sales);
-        renderSalesChart('overviewSalesChart', sales);
-        renderSalesChart('salesChart', sales);
+        renderProducts(productsCache);
+        renderStats(productsCache, salesCache);
+        renderSalesTable(salesCache);
+        renderSalesChart('overviewSalesChart', salesCache);
+        renderSalesChart('salesChart', salesCache);
     }
 
-    // muestra mensajes cortos debajo del formulario de producto
-    function setProductMessage(message, type) {
-        if (!productMessage) {
+    // limpia el formulario despues de publicar o editar
+    function resetProductForm() {
+        editingProductId = null;
+        productForm.reset();
+        productFormTitle.textContent = 'Publicar producto';
+        productSubmitBtn.textContent = 'Publicar';
+        cancelEditBtn.classList.remove('active');
+    }
+
+    // carga un producto publicado dentro del formulario de edicion
+    function startEditProduct(productId) {
+        const product = productsCache.find(function (item) {
+            return String(item.Id) === String(productId);
+        });
+
+        if (!product) {
+            setProductMessage('No se encontro el producto.', 'error');
             return;
         }
 
-        productMessage.textContent = message;
+        editingProductId = product.Id;
+        document.getElementById('productName').value = product.NombreProducto || '';
+        document.getElementById('productDescription').value = product.Descripcion || '';
+        document.getElementById('productCategory').value = product.IdCategoria || '';
+        document.getElementById('productPrice').value = product.Precio || '';
+        document.getElementById('productStock').value = product.Stock || '';
+        document.getElementById('productImage').value = '';
 
-        if (type === 'error') {
-            productMessage.classList.add('error');
-        } else {
-            productMessage.classList.remove('error');
-        }
+        productFormTitle.textContent = 'Editar producto';
+        productSubmitBtn.textContent = 'Guardar cambios';
+        cancelEditBtn.classList.add('active');
+        setDashboardView('products');
+        setProductMessage('Editando producto: ' + product.NombreProducto, 'success');
     }
 
-    function setProfileMessage(message, type) {
-        if (!profileMessage) {
-            return;
-        }
-
-        profileMessage.textContent = message;
-
-        if (type === 'error') {
-            profileMessage.classList.add('error');
-        } else {
-            profileMessage.classList.remove('error');
-        }
-    }
-
-    function setSaleMessage(message, type) {
-        if (!saleMessage) {
-            return;
-        }
-
-        saleMessage.textContent = message;
-
-        if (type === 'error') {
-            saleMessage.classList.add('error');
-        } else {
-            saleMessage.classList.remove('error');
-        }
-    }
-
-    // encuentra una venta para abrirla en el modal
-    function findSaleById(saleId) {
-        const sales = getSellerSales();
-
-        for (let i = 0; i < sales.length; i++) {
-            if (String(sales[i].id) === String(saleId)) {
-                return sales[i];
-            }
-        }
-
-        return null;
-    }
-
-    // llena el modal con contacto, pago, envio y estado
-    function openSaleModal(saleId) {
-        const sale = findSaleById(saleId);
-
-        if (!sale) {
-            return;
-        }
-
-        activeSaleId = sale.id;
-        document.getElementById('saleDetailProduct').textContent = sale.productName;
-        document.getElementById('saleDetailCustomer').textContent = sale.customer;
-        document.getElementById('saleDetailTotal').textContent = formatCurrency(sale.total);
-        document.getElementById('saleDetailEmail').textContent = sale.customerEmail || 'correo@nicagrow.com';
-        document.getElementById('saleDetailPhone').textContent = sale.customerPhone || '+505 9999 0000';
-        document.getElementById('saleDetailQuantity').textContent = sale.quantity || 1;
-        document.getElementById('saleDetailPayment').textContent = sale.paymentMethod || 'Pago contra entrega';
-        document.getElementById('saleDetailShipping').textContent = sale.shipping || 'Cargotrans';
-        document.getElementById('saleDetailAddress').textContent = sale.address || 'Nicaragua';
-        saleStatusSelect.value = getStatusLabel(sale.status);
-        setSaleMessage('', 'success');
-        saleModal.classList.add('active');
-    }
-
-    // cierra el modal de detalle de venta
-    function closeSaleModal() {
-        saleModal.classList.remove('active');
-        activeSaleId = null;
-    }
-
-    // guarda el estado que controla el vendedor
-    function saveSaleStatus() {
-        const purchases = getStoredItems(purchasesKey);
-        const sales = getStoredItems(salesKey);
-        let updated = false;
-
-        for (let i = 0; i < purchases.length; i++) {
-            if (String(purchases[i].id) === String(activeSaleId)) {
-                purchases[i].status = saleStatusSelect.value;
-                updated = true;
-            }
-        }
-
-        if (!updated) {
-            for (let i = 0; i < sales.length; i++) {
-                if (String(sales[i].id) === String(activeSaleId)) {
-                    sales[i].status = saleStatusSelect.value;
-                    updated = true;
-                }
-            }
-        }
-
-        if (!updated) {
-            setSaleMessage('No se encontro la venta.', 'error');
-            return;
-        }
-
-        saveStoredItems(purchasesKey, purchases);
-        saveStoredItems(salesKey, sales);
-        renderDashboard();
-        openSaleModal(activeSaleId);
-        setSaleMessage('Estado actualizado correctamente.', 'success');
-    }
-
+    // rellena el modal con la informacion del vendedor
     function fillProfileForm() {
         document.getElementById('profileFirstName').value = currentUser.firstName || '';
         document.getElementById('profileLastName').value = currentUser.lastName || '';
@@ -694,12 +397,12 @@ if (!currentUser || currentUser.role !== 'seller') {
         document.getElementById('profileEmail').value = currentUser.email || '';
         document.getElementById('profileBirthDate').value = currentUser.birthDate || '';
         document.getElementById('profilePhone').value = currentUser.phone || '';
-        document.getElementById('profileCity').value = currentUser.city || '';
-
+        document.getElementById('profileCity').value = currentUser.city || currentUser.cityId || '';
         profileDisplayName.textContent = (currentUser.firstName || '') + ' ' + (currentUser.lastName || '');
         profileBusinessName.textContent = currentUser.businessName || 'Nombre del negocio';
     }
 
+    // abre y cierra el modal del perfil
     function openProfileModal() {
         fillProfileForm();
         setProfileMessage('', 'success');
@@ -710,260 +413,196 @@ if (!currentUser || currentUser.role !== 'seller') {
         profileModal.classList.remove('active');
     }
 
-    function emailBelongsToOtherUser(users, email) {
-        for (let i = 0; i < users.length; i++) {
-            const sameEmail = String(users[i].email).toLowerCase() === email;
-            const otherUser = users[i].id !== currentUser.id;
+    // muestra todos los datos de una venta para poder cambiar su estado
+    function openSaleModal(index) {
+        const sale = salesCache[Number(index)];
 
-            if (sameEmail && otherUser) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    function saveProfileChanges() {
-        const firstName = document.getElementById('profileFirstName').value.trim();
-        const lastName = document.getElementById('profileLastName').value.trim();
-        const businessName = document.getElementById('profileBusinessInput').value.trim();
-        const email = document.getElementById('profileEmail').value.trim().toLowerCase();
-        const birthDate = document.getElementById('profileBirthDate').value;
-        const phone = document.getElementById('profilePhone').value.trim();
-        const city = document.getElementById('profileCity').value.trim();
-
-        if (!firstName || !lastName || !email || !birthDate || !phone || !city) {
-            setProfileMessage('Completa todos los datos del perfil.', 'error');
+        if (!sale) {
             return;
         }
 
-        const users = getStoredItems(usersKey);
+        activeSale = sale;
+        document.getElementById('saleDetailProduct').textContent = sale.NombreProducto;
+        document.getElementById('saleDetailCustomer').textContent = sale.Cliente;
+        document.getElementById('saleDetailTotal').textContent = formatCurrency(sale.Subtotal);
+        document.getElementById('saleDetailEmail').textContent = sale.ClienteCorreo || 'Sin correo';
+        document.getElementById('saleDetailPhone').textContent = sale.ClienteTelefono || 'Sin telefono';
+        document.getElementById('saleDetailQuantity').textContent = sale.Cantidad;
+        document.getElementById('saleDetailPayment').textContent = sale.MetodoPago;
+        document.getElementById('saleDetailShipping').textContent = sale.MetodoEnvio;
+        document.getElementById('saleDetailAddress').textContent = sale.Direccion || 'Sin direccion registrada';
+        saleStatusSelect.value = getStatusLabel(sale.Estado);
+        setSaleMessage('', 'success');
+        saleModal.classList.add('active');
+    }
 
-        if (emailBelongsToOtherUser(users, email)) {
-            setProfileMessage('Ese correo ya pertenece a otra cuenta.', 'error');
+    // guarda el nuevo estado de la venta en django
+    async function saveSaleStatus() {
+        if (!activeSale) {
             return;
         }
 
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].id === currentUser.id) {
-                users[i].firstName = firstName;
-                users[i].lastName = lastName;
-                users[i].businessName = businessName;
-                users[i].email = email;
-                users[i].birthDate = birthDate;
-                users[i].phone = phone;
-                users[i].city = city;
+        try {
+            const estado = await NicaGrowApi.getEstado(saleStatusSelect.value);
+            const pedidos = await NicaGrowApi.list('/pedidos/');
+            const pedido = pedidos.find(function (item) {
+                return String(item.Id) === String(activeSale.IdPedido);
+            });
+
+            if (!pedido) {
+                setSaleMessage('No se encontro el pedido.', 'error');
+                return;
             }
+
+            await NicaGrowApi.patch('/pedidos/' + activeSale.IdPedido + '/', {
+                IdEstado: estado.Id
+            });
+            setSaleMessage('Estado actualizado correctamente.', 'success');
+            await loadDashboard();
+        } catch (error) {
+            setSaleMessage(error.message || 'No se pudo actualizar el estado.', 'error');
         }
-
-        currentUser.firstName = firstName;
-        currentUser.lastName = lastName;
-        currentUser.businessName = businessName;
-        currentUser.email = email;
-        currentUser.birthDate = birthDate;
-        currentUser.phone = phone;
-        currentUser.city = city;
-
-        saveStoredItems(usersKey, users);
-        saveSession(currentUser);
-        sellerSessionName.textContent = currentUser.firstName + ' ' + currentUser.lastName;
-        profileDisplayName.textContent = currentUser.firstName + ' ' + currentUser.lastName;
-        profileBusinessName.textContent = currentUser.businessName || 'Nombre del negocio';
-        setProfileMessage('Perfil actualizado correctamente.', 'success');
     }
 
-    function resetProductForm() {
-        editingProductId = null;
-        productForm.reset();
-        productFormTitle.textContent = 'Publicar producto';
-        productSubmitBtn.textContent = 'Publicar';
-        cancelEditBtn.classList.remove('active');
-    }
-
-    function findProductById(productId) {
-        const products = getStoredItems(productsKey);
-
-        for (let i = 0; i < products.length; i++) {
-            if (String(products[i].id) === String(productId)) {
-                return products[i];
-            }
-        }
-
-        return null;
-    }
-
-    function startEditProduct(productId) {
-        const product = findProductById(productId);
-
-        if (!product) {
-            setProductMessage('No se encontro el producto.', 'error');
-            return;
-        }
-
-        editingProductId = product.id;
-        document.getElementById('productName').value = product.name || '';
-        document.getElementById('productDescription').value = product.description || '';
-        document.getElementById('productCategory').value = product.category || '';
-        document.getElementById('productPrice').value = product.price || '';
-        document.getElementById('productStock').value = product.stock || '';
-
-        if (product.isLocalSample) {
-            document.getElementById('productImage').value = '';
-        } else {
-            document.getElementById('productImage').value = product.image || '';
-        }
-
-        productFormTitle.textContent = 'Editar producto';
-        productSubmitBtn.textContent = 'Guardar cambios';
-        cancelEditBtn.classList.add('active');
-        setDashboardView('products');
-        setProductMessage('Editando producto: ' + product.name, 'success');
-    }
-
+    // navegacion interna del dashboard
     for (let i = 0; i < navButtons.length; i++) {
         navButtons[i].addEventListener('click', function () {
             setDashboardView(this.dataset.dashboardView);
         });
     }
 
+    // acciones delegadas para productos y ventas
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('seller-edit-product-btn')) {
             startEditProduct(event.target.dataset.productId);
         }
 
         if (event.target.classList.contains('seller-sale-detail-btn')) {
-            openSaleModal(event.target.dataset.saleId);
+            openSaleModal(event.target.dataset.saleIndex);
         }
     });
 
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', function () {
-            resetProductForm();
-            setProductMessage('', 'success');
-        });
-    }
+    // botones principales de modales y formularios
+    cancelEditBtn.addEventListener('click', function () {
+        resetProductForm();
+        setProductMessage('', 'success');
+    });
 
-    if (profileButton) {
-        profileButton.addEventListener('click', function () {
-            openProfileModal();
-        });
-    }
+    profileButton.addEventListener('click', openProfileModal);
+    closeProfileBtn.addEventListener('click', closeProfileModal);
+    closeSaleModalBtn.addEventListener('click', function () {
+        saleModal.classList.remove('active');
+        activeSale = null;
+    });
+    saveSaleStatusBtn.addEventListener('click', saveSaleStatus);
 
-    if (closeProfileBtn) {
-        closeProfileBtn.addEventListener('click', function () {
+    profileModal.addEventListener('click', function (event) {
+        if (event.target === profileModal) {
             closeProfileModal();
-        });
-    }
+        }
+    });
 
-    if (profileModal) {
-        profileModal.addEventListener('click', function (event) {
-            if (event.target === profileModal) {
-                closeProfileModal();
+    saleModal.addEventListener('click', function (event) {
+        if (event.target === saleModal) {
+            saleModal.classList.remove('active');
+        }
+    });
+
+    // guarda los cambios del perfil del vendedor
+    profileForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        try {
+            const city = await NicaGrowApi.ensureCiudad(document.getElementById('profileCity').value.trim());
+            const payload = {
+                Nombre: document.getElementById('profileFirstName').value.trim(),
+                Apellidos: document.getElementById('profileLastName').value.trim(),
+                NombreNegocio: document.getElementById('profileBusinessInput').value.trim() || currentUser.businessName,
+                Correo: document.getElementById('profileEmail').value.trim().toLowerCase(),
+                FNacimiento: document.getElementById('profileBirthDate').value,
+                Telefono: document.getElementById('profilePhone').value.trim(),
+                IdCiudad: city.Id
+            };
+            const updated = await NicaGrowApi.patch('/vendedores/' + currentUser.id + '/', payload);
+
+            currentUser.firstName = updated.Nombre;
+            currentUser.lastName = updated.Apellidos;
+            currentUser.businessName = updated.NombreNegocio;
+            currentUser.email = updated.Correo;
+            currentUser.birthDate = updated.FNacimiento;
+            currentUser.phone = updated.Telefono;
+            currentUser.cityId = updated.IdCiudad;
+            currentUser.city = city.Ciudad;
+            saveSession(currentUser);
+            sellerSessionName.textContent = currentUser.firstName + ' ' + currentUser.lastName;
+            fillProfileForm();
+            setProfileMessage('Perfil actualizado correctamente.', 'success');
+            await loadDashboard();
+        } catch (error) {
+            setProfileMessage(error.message || 'No se pudo actualizar el perfil.', 'error');
+        }
+    });
+
+    // publica productos nuevos o guarda cambios de productos existentes
+    productForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const productName = document.getElementById('productName').value.trim();
+        const productDescription = document.getElementById('productDescription').value.trim();
+        const productPrice = document.getElementById('productPrice').value;
+        const productStock = document.getElementById('productStock').value;
+        const categoryId = productCategory.value;
+        const productImageFile = document.getElementById('productImage').files[0];
+
+        if (!productName || !categoryId || !productPrice || !productStock) {
+            setProductMessage('Completa los datos del producto.', 'error');
+            return;
+        }
+
+        const payload = {
+            IdVendedor: currentUser.id,
+            NombreProducto: productName,
+            Precio: Number(productPrice),
+            Stock: Number(productStock),
+            IdCategoria: categoryId,
+            Descripcion: productDescription
+        };
+
+        try {
+            const imageBase64 = await readImageFile(productImageFile);
+
+            if (imageBase64) {
+                payload.FotoBase64 = imageBase64;
             }
-        });
-    }
-
-    if (profileForm) {
-        profileForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            saveProfileChanges();
-        });
-    }
-
-    if (closeSaleModalBtn) {
-        closeSaleModalBtn.addEventListener('click', function () {
-            closeSaleModal();
-        });
-    }
-
-    if (saleModal) {
-        saleModal.addEventListener('click', function (event) {
-            if (event.target === saleModal) {
-                closeSaleModal();
-            }
-        });
-    }
-
-    if (saveSaleStatusBtn) {
-        saveSaleStatusBtn.addEventListener('click', function () {
-            saveSaleStatus();
-        });
-    }
-
-    // guarda un producto nuevo y vuelve a pintar el panel
-    if (productForm) {
-        productForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const productName = document.getElementById('productName').value.trim();
-            const productDescription = document.getElementById('productDescription').value.trim();
-            const productCategory = document.getElementById('productCategory').value;
-            const productPrice = document.getElementById('productPrice').value;
-            const productStock = document.getElementById('productStock').value;
-            const productImage = document.getElementById('productImage').value;
-
-            if (!productName || !productDescription || !productCategory || !productPrice || !productStock) {
-                setProductMessage('Completa los datos del producto.', 'error');
-                return;
-            }
-
-            const products = getStoredItems(productsKey);
-            let edited = false;
 
             if (editingProductId) {
-                for (let i = 0; i < products.length; i++) {
-                    if (String(products[i].id) === String(editingProductId)) {
-                        products[i].name = productName;
-                        products[i].description = productDescription;
-                        products[i].category = productCategory;
-                        products[i].price = Number(productPrice);
-                        products[i].stock = Number(productStock);
-
-                        if (!products[i].isLocalSample) {
-                            products[i].image = getExternalImage(productImage);
-                        }
-
-                        edited = true;
-                    }
-                }
-            } else {
-                products.push({
-                    id: Date.now(),
-                    sellerId: currentUser.id,
-                    name: productName,
-                    description: productDescription,
-                    category: productCategory,
-                    price: Number(productPrice),
-                    stock: Number(productStock),
-                    image: getExternalImage(productImage)
-                });
-            }
-
-            if (editingProductId && !edited) {
-                setProductMessage('No se pudo actualizar el producto.', 'error');
-                return;
-            }
-
-            saveStoredItems(productsKey, products);
-
-            if (edited) {
+                await NicaGrowApi.patch('/productos/' + editingProductId + '/', payload);
                 setProductMessage('Producto actualizado correctamente.', 'success');
             } else {
+                await NicaGrowApi.post('/productos/', payload);
                 setProductMessage('Producto publicado correctamente.', 'success');
             }
 
             resetProductForm();
-            renderDashboard();
-        });
-    }
+            await loadDashboard();
+        } catch (error) {
+            setProductMessage(error.message || 'No se pudo guardar el producto.', 'error');
+        }
+    });
 
-    // cierra la sesion y obliga a escoger tipo de cuenta otra vez
-    if (logoutButton) {
-        logoutButton.addEventListener('click', function () {
-            localStorage.removeItem(sessionKey);
-            window.location.href = 'account-type.html';
-        });
-    }
+    // cierra la sesion actual
+    logoutButton.addEventListener('click', function () {
+        NicaGrowApi.clearSession();
+        window.location.href = 'account-type.html';
+    });
 
-    renderDashboard();
+    // arranque inicial del dashboard
+    (async function init() {
+        try {
+            await loadCategories();
+            await loadDashboard();
+        } catch (error) {
+            setProductMessage(error.message || 'No se pudo cargar el panel.', 'error');
+        }
+    })();
 }

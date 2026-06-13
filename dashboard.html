@@ -42,7 +42,8 @@
                                 <button type="button" class="seller-profile-icon" id="profileButton"
                                     aria-label="Abrir perfil"><i class="fas fa-user"></i></button>
                                 <span class="seller-session-pill" id="sellerSessionName">Vendedor</span>
-                                <button type="button" class="seller-logout-btn" id="logoutButton">Cerrar sesión</button>
+                                <button type="button" class="seller-profile-icon" id="logoutButton"
+                                    aria-label="Cerrar sesion"><i class="fas fa-right-from-bracket"></i></button>
                             </div>
                         </div>
                     </div>
@@ -121,8 +122,7 @@
                                 <input id="productStock" name="stock" type="number" min="1" placeholder="Stock"
                                     required>
                             </div>
-                            <input id="productImage" name="image" type="url"
-                                placeholder="URL externa de imagen (opcional)">
+                            <input id="productImage" name="image" type="file" accept="image/*">
 
                             <button type="submit" class="seller-submit-btn" id="productSubmitBtn">Publicar</button>
                             <button type="button" class="seller-cancel-btn" id="cancelEditBtn">Cancelar edicion</button>
@@ -249,7 +249,7 @@
                             </div>
 
                             <div class="seller-profile-followers">
-                                <strong id="profileFollowersCount">128</strong>
+                                <strong id="profileFollowersCount">0</strong>
                                 <span>seguidores</span>
                             </div>
                         </section>
@@ -289,6 +289,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 

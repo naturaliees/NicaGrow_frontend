@@ -51,13 +51,13 @@
                         <button type="button" class="role-card" data-role="seller">
                             <i class="bi bi-shop-window"></i>
                             <span>Vendedor</span>
-                            <small>Publica productos, gestiona ventas y usa el dashboard.</small>
+                            <small>Publica productos y administra ventas.</small>
                         </button>
 
                         <button type="button" class="role-card" data-role="buyer">
                             <i class="bi bi-bag-heart-fill"></i>
                             <span>Comprador</span>
-                            <small>Explora productos, compra y guarda tus datos como cliente.</small>
+                            <small>Explora productos nacionales.</small>
                         </button>
                     </div>
 
@@ -108,7 +108,22 @@
                         </div>
 
                         <div class="input-box full-width">
-                            <input id="city" name="city" type="text" placeholder="Ciudad" required>
+                            <select id="city" name="city" required>
+                                <option value="">Selecciona tu ciudad</option>
+                                <option value="BO">BO - Boaco</option>
+                                <option value="CA">CA - Carazo</option>
+                                <option value="CH">CH - Chinandega</option>
+                                <option value="CHO">CHO - Chontales</option>
+                                <option value="ES">ES - Esteli</option>
+                                <option value="GR">GR - Granada</option>
+                                <option value="JN">JN - Jinotega</option>
+                                <option value="L">L - Leon</option>
+                                <option value="MD">MD - Madriz</option>
+                                <option value="M">M - Managua</option>
+                                <option value="MY">MY - Masaya</option>
+                                <option value="MT">MT - Matagalpa</option>
+                                <option value="RI">RI - Rivas</option>
+                            </select>
                         </div>
                     </div>
 
@@ -132,6 +147,7 @@
         </div>
     </div>
 
+    <script src="js/api.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

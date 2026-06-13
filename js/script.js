@@ -1,12 +1,11 @@
-const usersKey = 'nicagrowUsers';
-const sessionKey = 'nicagrowCurrentUser';
 const accountTypeKey = 'nicagrowSelectedRole';
 
-// elementos principales del formulario
+// elementos principales que controlan el cambio entre login y registro
 const container = document.querySelector('.container');
 const registerBtn = document.querySelector('.register-btn');
 const loginBtn = document.querySelector('.login-btn');
 
+// formularios y mensajes que se actualizan segun cada accion
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const loginMessage = document.getElementById('loginMessage');
@@ -21,43 +20,18 @@ const backToRolesBtn = document.getElementById('backToRolesBtn');
 const roleStep = document.querySelector('.role-step');
 const detailsStep = document.querySelector('.details-step');
 
-// nombres visibles para cada tipo de cuenta
+// etiquetas visibles para el tipo de cuenta seleccionado
 const roleLabels = {
     seller: 'Vendedor',
     buyer: 'Comprador'
 };
 
-// obtiene el rol que se escogio antes de entrar al login
+// lee la cuenta elegida antes de entrar al login
 function getSelectedAccountType() {
     return localStorage.getItem(accountTypeKey);
 }
 
-// lee los usuarios guardados en el navegador
-function getUsers() {
-    try {
-        const users = JSON.parse(localStorage.getItem(usersKey));
-
-        if (users) {
-            return users;
-        }
-
-        return [];
-    } catch {
-        return [];
-    }
-}
-
-// guarda la lista completa de usuarios
-function saveUsers(users) {
-    localStorage.setItem(usersKey, JSON.stringify(users));
-}
-
-// guarda el usuario que inicio sesion
-function saveSession(user) {
-    localStorage.setItem(sessionKey, JSON.stringify(user));
-}
-
-// muestra mensajes de error o exito en los formularios
+// muestra mensajes de error o exito dentro de cada formulario
 function setMessage(element, message, type) {
     if (!element) {
         return;
@@ -72,7 +46,7 @@ function setMessage(element, message, type) {
     }
 }
 
-// limpia mensajes antes de volver a validar
+// limpia mensajes anteriores para que no confundan al usuario
 function clearMessage(element) {
     if (!element) {
         return;
@@ -82,36 +56,32 @@ function clearMessage(element) {
     element.classList.remove('success');
 }
 
-// marca visualmente el rol elegido para el registro
+// guarda visualmente si el usuario quiere cuenta de comprador o vendedor
 function setSelectedRole(role) {
     registerRoleInput.value = role;
     selectedRoleLabel.textContent = roleLabels[role] || 'Cuenta';
     localStorage.setItem(accountTypeKey, role);
 
     for (let i = 0; i < roleCards.length; i++) {
-        if (roleCards[i].dataset.role === role) {
-            roleCards[i].classList.add('active');
-        } else {
-            roleCards[i].classList.remove('active');
-        }
+        roleCards[i].classList.toggle('active', roleCards[i].dataset.role === role);
     }
 
     clearMessage(registerRoleMessage);
 }
 
-// vuelve al paso donde se escoge el tipo de cuenta
+// vuelve al primer paso del registro
 function showRoleStep() {
     roleStep.classList.add('active');
     detailsStep.classList.remove('active');
 }
 
-// muestra el formulario con los datos del usuario
+// abre el formulario con los datos personales
 function showDetailsStep() {
     roleStep.classList.remove('active');
     detailsStep.classList.add('active');
 }
 
-// manda a cada usuario a la pantalla que le corresponde
+// manda al dashboard correcto despues de iniciar sesion
 function redirectByRole(role) {
     if (role === 'seller') {
         window.location.href = 'dashboard.html';
@@ -120,7 +90,7 @@ function redirectByRole(role) {
     }
 }
 
-// si ya venia un rol elegido, lo aplica al registro
+// aplica el tipo de cuenta que venia desde la pantalla anterior
 function applySelectedRoleToRegister() {
     const selectedRole = getSelectedAccountType();
 
@@ -129,34 +99,50 @@ function applySelectedRoleToRegister() {
     }
 }
 
-// revisa si el correo ya fue usado
-function emailAlreadyExists(users, email) {
-    for (let i = 0; i < users.length; i++) {
-        if (String(users[i].email).toLowerCase() === email) {
-            return true;
-        }
+// bloquea botones mientras una peticion esta en proceso
+function setLoading(button, isLoading, label) {
+    if (!button) {
+        return;
     }
 
-    return false;
-}
-
-// busca un usuario que coincida con correo y contrasena
-function findUser(users, email, password) {
-    for (let i = 0; i < users.length; i++) {
-        const sameEmail = String(users[i].email).toLowerCase() === email;
-        const samePassword = users[i].password === password;
-
-        if (sameEmail && samePassword) {
-            return users[i];
-        }
+    if (!button.dataset.originalText) {
+        button.dataset.originalText = button.textContent;
     }
 
-    return null;
+    button.disabled = isLoading;
+    button.textContent = isLoading ? label : button.dataset.originalText;
 }
 
+// arma el cuerpo correcto para registrar compradores o vendedores
+async function registerUser(payload) {
+    if (payload.role === 'buyer') {
+        return NicaGrowApi.post('/auth/registro-cliente/', {
+            Nombre: payload.firstName,
+            Apellidos: payload.lastName,
+            Correo: payload.email,
+            Telefono: payload.phone,
+            FNacimiento: payload.birthDate,
+            IdCiudad: payload.city.Id,
+            Contrasena: payload.password
+        });
+    }
+
+    return NicaGrowApi.post('/auth/registro-vendedor/', {
+        Nombre: payload.firstName,
+        Apellidos: payload.lastName,
+        NombreNegocio: payload.businessName,
+        Correo: payload.email,
+        Telefono: payload.phone,
+        FNacimiento: payload.birthDate,
+        IdCiudad: payload.city.Id,
+        Contrasena: payload.password
+    });
+}
+
+// deja listo el registro con el rol guardado
 applySelectedRoleToRegister();
 
-// abre el formulario de registro
+// abre el panel de registro desde el login
 registerBtn.addEventListener('click', function () {
     container.classList.add('active');
     showRoleStep();
@@ -164,13 +150,13 @@ registerBtn.addEventListener('click', function () {
     clearMessage(registerMessage);
 });
 
-// vuelve al formulario de inicio de sesion
+// regresa al panel de inicio de sesion
 loginBtn.addEventListener('click', function () {
     container.classList.remove('active');
     clearMessage(loginMessage);
 });
 
-// permite escoger comprador o vendedor
+// permite elegir comprador o vendedor dentro del registro
 roleSelector.addEventListener('click', function (event) {
     const button = event.target.closest('.role-card');
 
@@ -179,7 +165,7 @@ roleSelector.addEventListener('click', function (event) {
     }
 });
 
-// pasa del rol a los datos personales
+// valida que exista un rol antes de pasar al formulario
 continueRegisterBtn.addEventListener('click', function () {
     if (!registerRoleInput.value) {
         setMessage(registerRoleMessage, 'Selecciona si deseas registrarte como vendedor o comprador.');
@@ -190,17 +176,18 @@ continueRegisterBtn.addEventListener('click', function () {
     clearMessage(registerMessage);
 });
 
-// vuelve del formulario de datos al selector de rol
+// permite corregir el tipo de cuenta antes de crearla
 backToRolesBtn.addEventListener('click', function () {
     showRoleStep();
     clearMessage(registerMessage);
 });
 
-// crea la cuenta y entra automaticamente
-registerForm.addEventListener('submit', function (event) {
+// envia el registro a django y entra automaticamente
+registerForm.addEventListener('submit', async function (event) {
     event.preventDefault();
     clearMessage(registerMessage);
 
+    const submitButton = registerForm.querySelector('.details-step .btn');
     const role = registerRoleInput.value;
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
@@ -208,72 +195,71 @@ registerForm.addEventListener('submit', function (event) {
     const password = document.getElementById('registerPassword').value;
     const birthDate = document.getElementById('birthDate').value;
     const phone = document.getElementById('phone').value.trim();
-    const city = document.getElementById('city').value.trim();
+    const cityName = document.getElementById('city').value.trim();
 
-    if (!role || !firstName || !lastName || !email || !password || !birthDate || !phone || !city) {
+    if (!role || !firstName || !lastName || !email || !password || !birthDate || !phone || !cityName) {
         setMessage(registerMessage, 'Completa todos los campos para crear tu cuenta.');
         return;
     }
 
     if (password.trim().length < 6) {
-        setMessage(registerMessage, 'La contraseña debe tener al menos 6 caracteres.');
+        setMessage(registerMessage, 'La contrasena debe tener al menos 6 caracteres.');
         return;
     }
 
-    const users = getUsers();
-
-    if (emailAlreadyExists(users, email)) {
-        setMessage(registerMessage, 'Ese correo ya está registrado. Intenta iniciar sesión.');
-        return;
+    try {
+        setLoading(submitButton, true, 'Creando...');
+        const city = await NicaGrowApi.ensureCiudad(cityName);
+        const response = await registerUser({
+            role: role,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            birthDate: birthDate,
+            phone: phone,
+            city: city,
+            businessName: firstName + ' ' + lastName
+        });
+        const user = NicaGrowApi.saveSession(response);
+        user.city = city.Ciudad;
+        user.cityId = city.Id;
+        localStorage.setItem('nicagrowCurrentUser', JSON.stringify(user));
+        redirectByRole(user.role);
+    } catch (error) {
+        setMessage(registerMessage, error.message || 'No se pudo crear la cuenta.');
+    } finally {
+        setLoading(submitButton, false);
     }
-
-    const newUser = {
-        id: Date.now(),
-        role: role,
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password,
-        birthDate: birthDate,
-        phone: phone,
-        city: city
-    };
-
-    users.push(newUser);
-    saveUsers(users);
-    saveSession(newUser);
-
-    setTimeout(function () {
-        redirectByRole(newUser.role);
-    }, 300);
 });
 
-// valida el login y abre la pantalla segun el rol guardado
-loginForm.addEventListener('submit', function (event) {
+// valida credenciales y abre el dashboard segun el rol
+loginForm.addEventListener('submit', async function (event) {
     event.preventDefault();
     clearMessage(loginMessage);
 
+    const submitButton = loginForm.querySelector('.btn');
     const email = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value.trim();
 
     if (!email || !password) {
-        setMessage(loginMessage, 'Ingresa tu correo y contraseña para continuar.');
+        setMessage(loginMessage, 'Ingresa tu correo y contrasena para continuar.');
         return;
     }
 
-    const users = getUsers();
-    const user = findUser(users, email, password);
-
-    if (!user) {
-        setMessage(loginMessage, 'Las credenciales no coinciden con ninguna cuenta registrada.');
-        return;
-    }
-
-    localStorage.setItem(accountTypeKey, user.role);
-    saveSession(user);
-    setMessage(loginMessage, 'Bienvenido, ' + user.firstName + '. Redirigiendo...', 'success');
-
-    setTimeout(function () {
+    try {
+        setLoading(submitButton, true, 'Entrando...');
+        const response = await NicaGrowApi.post('/auth/login/', {
+            Correo: email,
+            Contrasena: password
+        });
+        const user = NicaGrowApi.saveSession(response);
+        localStorage.setItem(accountTypeKey, user.role);
+        setMessage(loginMessage, 'Bienvenido, ' + user.firstName + '. Redirigiendo...', 'success');
         redirectByRole(user.role);
-    }, 700);
+    } catch (error) {
+        setMessage(loginMessage, error.message || 'Las credenciales no coinciden con ninguna cuenta registrada.');
+    } finally {
+        setLoading(submitButton, false);
+    }
 });

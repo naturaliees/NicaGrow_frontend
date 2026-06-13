@@ -622,19 +622,26 @@ header .fa-bars{
 
 /* dashboard de vendedor en documento separado */
 .seller-dashboard-page{
-    background: #f4f4f4;
+    background:#dfe0ff;
+    min-height:100vh;
 }
 
 .seller-dashboard{
     min-height: 100vh;
+    padding:0 !important;
+}
+
+.seller-dashboard .container-fluid{
+    min-height:100vh;
+    padding:0 !important;
 }
 
 .dashboard-shell{
     background: #dfe0ff;
     padding: 1.4rem;
-    min-height: 100%;
-    border-radius: 1.4rem;
-    box-shadow: 0 20px 45px rgba(47, 59, 128, 0.08);
+    min-height: 100vh;
+    border-radius:0;
+    box-shadow:none;
 }
 
 .seller-navbar{
@@ -1371,6 +1378,17 @@ header .fa-bars{
     font-size:14px;
 }
 
+.buyer-category-filter{
+    width:min(230px, 100%);
+    min-height:42px;
+    padding:0 14px;
+    border-radius:999px;
+    background:#fff;
+    color:#404049;
+    font-size:14px;
+    box-shadow:0 8px 18px rgba(47, 59, 128, 0.08);
+}
+
 .buyer-icon-btn{
     width:36px;
     height:36px;
@@ -1523,6 +1541,10 @@ header .fa-bars{
     align-items:start;
 }
 
+.buyer-purchase-top.no-image{
+    grid-template-columns:1fr;
+}
+
 .buyer-purchase-top img{
     width:100%;
     aspect-ratio:1.55 / 1;
@@ -1655,7 +1677,8 @@ header .fa-bars{
         margin-bottom:40px;
     }
 
-    .buyer-search{
+    .buyer-search,
+    .buyer-category-filter{
         width:100%;
     }
 
@@ -1678,18 +1701,19 @@ header .fa-bars{
 /* ajustes finales del dashboard de clientes para alinearlo al panel de vendedor */
 .buyer-dashboard-page{
     font-family:"Manrope", sans-serif;
-    background:#f4f4f4;
+    background:#dfe0ff;
+    min-height:100vh;
 }
 
 /* caja principal del dashboard de clientes */
 .buyer-shell{
-    width:auto;
-    min-height:calc(100vh - 48px);
-    margin:24px;
+    width:100%;
+    min-height:100vh;
+    margin:0;
     padding:1.4rem;
-    border-radius:1.4rem;
+    border-radius:0;
     background:#dfe0ff;
-    box-shadow:0 20px 45px rgba(47, 59, 128, 0.08);
+    box-shadow:none;
 }
 
 /* barra superior con navegacion, busqueda y acciones */
@@ -1822,6 +1846,10 @@ header .fa-bars{
     aspect-ratio:1 / 1;
 }
 
+.buyer-product-placeholder{
+    border-radius:0;
+}
+
 .buyer-product-info{
     padding:1.2rem 1.4rem 1.4rem;
 }
@@ -1838,6 +1866,33 @@ header .fa-bars{
 .buyer-card-actions{
     justify-content:center;
     flex-wrap:wrap;
+}
+
+.buyer-quantity-control{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin:10px 0 2px;
+}
+
+.buyer-quantity-control label{
+    color:#707388;
+    font-size:13px;
+    font-weight:800;
+}
+
+.buyer-quantity-control input{
+    width:76px;
+    min-height:34px;
+    padding:0 10px;
+    border:1px solid #d9dbf2;
+    border-radius:999px;
+    background:#fff;
+    color:#262730;
+    font-size:14px;
+    text-align:center;
 }
 
 /* botones de compra, vendedor y acciones de compra */
@@ -1898,6 +1953,13 @@ header .fa-bars{
     aspect-ratio:1 / 1;
     object-fit:cover;
     border-radius:12px;
+}
+
+.buyer-cart-placeholder{
+    width:82px;
+    aspect-ratio:1 / 1;
+    border-radius:12px;
+    font-size:12px;
 }
 
 .buyer-cart-item h3{
@@ -2062,7 +2124,6 @@ header .fa-bars{
 /* ajustes para tablets y pantallas medianas */
 @media(max-width: 900px){
     .buyer-shell{
-        margin:12px;
         padding:1rem;
     }
 
@@ -2105,9 +2166,8 @@ header .fa-bars{
 @media(max-width: 560px){
     .dashboard-shell,
     .buyer-shell{
-        margin:8px;
         padding:0.75rem;
-        border-radius:1rem;
+        border-radius:0;
     }
 
     .seller-navbar,
@@ -2169,6 +2229,7 @@ header .fa-bars{
     }
 
     .buyer-search,
+    .buyer-category-filter,
     .buyer-top-icons{
         width:100%;
     }
