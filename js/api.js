@@ -1,6 +1,6 @@
 const NicaGrowApi = (function () {
     // rutas y claves que usa el frontend para hablar con django
-    const defaultBaseUrl = 'https://suspended-equippd-foods-whale.trycloudflare.com/api';
+    const defaultBaseUrl = 'https://out-farms-simplified-poet.trycloudflare.com/api';
     const configKey = 'nicagrowApiUrl';
     const sessionKey = 'nicagrowCurrentUser';
     const tokenKey = 'nicagrowAccessToken';
