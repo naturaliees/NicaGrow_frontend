@@ -101,8 +101,6 @@
                             <div class="form-message" id="productMessage" aria-live="polite"></div>
 
                             <input id="productName" name="name" type="text" placeholder="Nombre del producto" required>
-                            <textarea id="productDescription" name="description" placeholder="Descripción"
-                                required></textarea>
                             <select id="productCategory" name="category" required>
                                 <option value="">Selecciona una categoria</option>
                                 <option value="Artesanias Tradicionales">Artesanias Tradicionales</option>
@@ -123,6 +121,7 @@
                                     required>
                             </div>
                             <input id="productImage" name="image" type="file" accept="image/*">
+                            <div class="product-image-preview" id="productImagePreview">sin foto</div>
 
                             <button type="submit" class="seller-submit-btn" id="productSubmitBtn">Publicar</button>
                             <button type="button" class="seller-cancel-btn" id="cancelEditBtn">Cancelar edicion</button>

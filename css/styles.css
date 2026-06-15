@@ -22,7 +22,7 @@
 }
 
 body{
-    background: #dadcf7;
+    background: var(--celeste);
 }
 
 /*base del documento*/
@@ -85,6 +85,19 @@ header .navbar a{
     padding: 0 1.2rem;
     color:#666;    
     text-decoration: none !important;   
+}
+
+header .navbar ul{
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+
+header .navbar li{
+    list-style:none;
 }
 
 header .navbar a:hover{
@@ -211,13 +224,18 @@ header .fa-bars{
     padding: 60px 9%;
 }
 
-.titulo-about{
+.section-title,
+.titulo-about,
+.titulo-contacto,
+.faq-title,
+.feature-title{
     text-align: center;
     font-size: 5rem;
     margin-bottom: 40px;
     font-family: "Manrope", sans-serif;
     font-weight: bold;
     text-transform: none;
+    color:var(--negro);
 }
 
 .about-container{
@@ -260,6 +278,7 @@ header .fa-bars{
     margin-top: 5px;
 }
 
+.about-item h3,
 .about-item h4{
     font-size: 1.6rem;
     margin-bottom: 5px;
@@ -269,6 +288,85 @@ header .fa-bars{
 .about-item p{
     font-size: 1.3rem;
     color: #555;
+}
+
+/*secciones amplias para explicar beneficios y funcionamiento*/
+.feature-section{
+    background: var(--celeste);
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    padding: 7rem 9%;
+    overflow: hidden;
+}
+
+.feature-panel{
+    position: relative;
+    width: 100%;
+    min-height: 55rem;
+    border-radius: 2.4rem;
+    background-size: cover;
+    background-position: center;
+    box-shadow: none !important;
+    filter: none;
+    display: flex;
+    align-items: center;
+    padding: 6rem;
+    overflow: hidden;
+}
+
+.feature-panel::before{
+    display: none;
+}
+
+.feature-section-right .feature-panel{
+    justify-content: flex-end;
+}
+
+.feature-section-left .feature-panel{
+    justify-content: flex-start;
+}
+
+.feature-content{
+    position: relative;
+    z-index: 1;
+    max-width: 56rem;
+}
+
+.feature-content .btn{
+    margin-top: 2rem;
+}
+
+.feature-tag{
+    display: inline-block;
+    margin-bottom: 2rem;
+    padding: .6rem 1.6rem;
+    border-radius: 5rem;
+    background: var(--amarillo);
+    color: var(--negro);
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.feature-title{
+    text-align: left;
+    margin-bottom: 2.4rem;
+    line-height: 1.15;
+    color: #fff;
+}
+
+.feature-content p{
+    color: #fff;
+    font-size: 2rem;
+    line-height: 1.7;
+}
+
+.feature-maracas{
+    background-image: url("../images/fondo_maracas.png");
+}
+
+.feature-cajetas{
+    background-image: url("../images/fondo_cajetas.png");
 }
 
 /*tarjetas de servicios con hover suave para destacar cada opcion*/
@@ -293,9 +391,18 @@ header .fa-bars{
   color: var(--azul);
 }
 
+.card h3,
 .card h5{
   font-size: 2rem;
   margin-bottom: 10px;
+}
+
+.services .card h3{
+    margin-bottom:18px;
+    color:var(--negro);
+    font-size:2.35rem;
+    font-weight:900;
+    line-height:1.15;
 }
 
 .card p{
@@ -303,19 +410,70 @@ header .fa-bars{
   color: #555;
 }
 
+/*preguntas frecuentes en tarjetas simples de bootstrap*/
+.faq-section{
+    background:var(--celeste);
+}
+
+.faq-title{
+    margin-bottom:34px;
+}
+
+.faq-card{
+    border-radius:0 0 12px 12px;
+    background:#fff;
+    box-shadow:none;
+}
+
+.faq-card:hover{
+    transform:none;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+.faq-card .card-body{
+    min-height:300px;
+    display:flex;
+    flex-direction:column;
+    padding:28px 30px;
+}
+
+.faq-card span{
+    margin-bottom:18px;
+    color:var(--azul);
+    font-size:1.35rem;
+    font-weight:800;
+}
+
+.faq-card h3{
+    margin-bottom:18px;
+    color:var(--negro);
+    font-size:2.35rem;
+    font-weight:900;
+    line-height:1.15;
+}
+
+.faq-card p{
+    color:#555;
+    font-size:1.55rem;
+    line-height:1.6;
+}
+
+.faq-card a{
+    margin-top:auto;
+    color:var(--azul);
+    font-size:1.5rem;
+    font-weight:900;
+    text-decoration:underline;
+}
+
+.faq-card a:hover{
+    color:var(--negro);
+}
 
 /*seccion de contacto dividida entre formulario e informacion*/
 .contact{
     padding: 20px 9%;
     background: #fff;
-}
-
-.titulo-contacto{
-    text-align: center;
-    font-size: 4rem;
-    font-weight: bold;
-    margin-bottom: 40px;
-    font-family: "Manrope", sans-serif;
 }
 
 .contact-container{
@@ -533,6 +691,10 @@ header .fa-bars{
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     }
 
+    header .navbar ul{
+        display:block;
+    }
+
     header  .navbar a{
         margin: 1.5rem;
         padding: 1,5rem;
@@ -567,9 +729,39 @@ header .fa-bars{
         flex-direction: column;
     }
 
-    .titulo-about {
+    .section-title,
+    .titulo-about,
+    .titulo-contacto,
+    .faq-title,
+    .feature-title{
         font-size: 3rem;
     }
+
+    .feature-section{
+        padding: 5rem 6%;
+    }
+
+    .feature-title{
+        text-align: center;
+    }
+
+    .feature-content{
+        max-width: 100%;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .feature-panel{
+        width: 100%;
+        min-height: 44rem;
+        justify-content: center;
+        padding: 4rem;
+    }
+
+    .feature-section-left .feature-panel{
+        justify-content: center;
+    }
+
 }
 
 /*contacto se apila para mejorar lectura en celular*/
@@ -589,7 +781,6 @@ header .fa-bars{
     }
 
     .titulo-contacto{
-        font-size: 3rem;
         margin-bottom: 28px;
     }
 }
@@ -600,8 +791,26 @@ header .fa-bars{
         padding: 20px 18px;
     }
 
-    .titulo-contacto{
+    .section-title,
+    .titulo-about,
+    .titulo-contacto,
+    .faq-title,
+    .feature-title{
         font-size: 2.4rem;
+    }
+
+    .feature-section{
+        padding: 4rem 18px;
+    }
+
+    .feature-content p{
+        font-size: 1.55rem;
+    }
+
+    .feature-panel{
+        min-height: 40rem;
+        border-radius: 1.8rem;
+        padding: 3rem 2rem;
     }
 
     .contact-form input,
@@ -629,11 +838,15 @@ header .fa-bars{
 .seller-dashboard{
     min-height: 100vh;
     padding:0 !important;
+    display:block;
+    align-items:initial;
+    justify-content:initial;
 }
 
-.seller-dashboard .container-fluid{
+.seller-dashboard > .container-fluid{
     min-height:100vh;
     padding:0 !important;
+    display:block;
 }
 
 .dashboard-shell{
@@ -642,6 +855,8 @@ header .fa-bars{
     min-height: 100vh;
     border-radius:0;
     box-shadow:none;
+    display:block;
+    align-content:start;
 }
 
 .seller-navbar{
@@ -651,6 +866,15 @@ header .fa-bars{
     padding: 16px 20px;
     border-radius: 1.1rem;
     border: 1px solid rgba(74, 82, 235, 0.08);
+}
+
+.seller-navbar .navbar-collapse{
+    align-items:center;
+    gap:16px;
+}
+
+.seller-nav-links{
+    gap:8px;
 }
 
 .seller-brand{
@@ -671,11 +895,14 @@ header .fa-bars{
     line-height: 1.2;
     background: transparent;
     border: 0;
+    border-radius:999px;
 }
 
-.seller-nav-links .nav-link.active{
+.seller-nav-links .nav-link.active,
+.seller-nav-links .nav-link:hover{
+    background:#fff;
     color: var(--negro);
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .seller-top-icons{
@@ -909,6 +1136,27 @@ header .fa-bars{
 .seller-product-form textarea{
     min-height:96px;
     resize:none;
+}
+
+.product-image-preview{
+    width:100%;
+    aspect-ratio:1 / 1;
+    border-radius:10px;
+    background:#eef0ff;
+    color:#707388;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    font-size:14px;
+    font-weight:800;
+    margin-bottom:12px;
+}
+
+.product-image-preview img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
 /* precio y stock comparten fila para ahorrar espacio */
@@ -1261,6 +1509,16 @@ header .fa-bars{
 
     .seller-navbar{
         padding: 14px 16px;
+    }
+
+    .seller-navbar .navbar-collapse{
+        align-items:flex-start;
+        gap:14px;
+        padding-top:14px;
+    }
+
+    .seller-nav-links{
+        width:100%;
     }
 
     .seller-profile-btn{
@@ -2271,5 +2529,16 @@ header .fa-bars{
         top:10px;
         right:14px;
         font-size:32px;
+    }
+}
+
+@media(max-width: 560px){
+    .faq-card .card-body{
+        min-height:auto;
+        padding:24px;
+    }
+
+    .faq-card h3{
+        font-size:2.1rem;
     }
 }

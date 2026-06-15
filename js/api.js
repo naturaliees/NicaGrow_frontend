@@ -1,6 +1,6 @@
 const NicaGrowApi = (function () {
     // rutas y claves que usa el frontend para hablar con django
-    const defaultBaseUrl = 'https://out-farms-simplified-poet.trycloudflare.com/api';
+    const defaultBaseUrl = 'http://localhost:8000/api';
     const configKey = 'nicagrowApiUrl';
     const sessionKey = 'nicagrowCurrentUser';
     const tokenKey = 'nicagrowAccessToken';
@@ -115,7 +115,7 @@ const NicaGrowApi = (function () {
                 headers: headers
             });
         } catch {
-            throw new Error('No se pudo conectar con la API local. Revisa que Django este corriendo en 127.0.0.1:8000.');
+            throw new Error('No se pudo conectar con la API local. Revisa que Django este corriendo en localhost:8000.');
         }
 
         let data = null;
@@ -147,6 +147,13 @@ const NicaGrowApi = (function () {
         return request(path, {
             method: 'PATCH',
             body: JSON.stringify(body)
+        });
+    }
+
+    // elimina recursos, por ejemplo articulos del carrito
+    function remove(path) {
+        return request(path, {
+            method: 'DELETE'
         });
     }
 
@@ -233,6 +240,7 @@ const NicaGrowApi = (function () {
         request: request,
         post: post,
         patch: patch,
+        remove: remove,
         list: list,
         ensureCiudad: ensureCiudad,
         getEstado: getEstado,

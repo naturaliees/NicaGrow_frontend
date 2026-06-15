@@ -168,7 +168,7 @@ body{
     text-align:center;
     padding:40px;
     z-index:1;
-    transition:right .6s ease-in-out, visibility 0s 1s;
+    transition:right .6s ease-in-out, bottom .6s ease-in-out, visibility 0s .25s;
 }
 
 .container.active .form-box{
@@ -179,8 +179,14 @@ body{
     visibility:hidden;
 }
 
+.container.active .form-box.login{
+    visibility:hidden;
+    transition-delay:0s, 0s, .25s;
+}
+
 .container.active .form-box.register{
     visibility:visible;
+    transition-delay:0s;
 }
 
 /* ancho completo para cada formulario */
@@ -487,6 +493,14 @@ form p{
         -webkit-overflow-scrolling:touch;
     }
 
+    .form-box.login form{
+        padding-top:38px;
+    }
+
+    .form-box.register form{
+        padding-top:0;
+    }
+
     .container.active .form-box{
         right:0;
         bottom:26%;
@@ -579,6 +593,10 @@ form p{
         padding:18px 14px;
     }
 
+    .form-box.login form{
+        padding-top:48px;
+    }
+
     .container.active .form-box{
         bottom:24%;
     }
@@ -640,6 +658,10 @@ form p{
     .form-box{
         height:74%;
         padding:16px;
+    }
+
+    .form-box.login form{
+        padding-top:52px;
     }
 
     .container.active .form-box{

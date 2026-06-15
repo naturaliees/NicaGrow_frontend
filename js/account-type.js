@@ -9,4 +9,3 @@ for (let i = 0; i < accountCards.length; i++) {
         window.location.href = 'login.html';
     });
 }
-    

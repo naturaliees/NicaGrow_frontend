@@ -113,6 +113,26 @@ function setLoading(button, isLoading, label) {
     button.textContent = isLoading ? label : button.dataset.originalText;
 }
 
+// valida que la fecha de nacimiento indique al menos 18 anos
+function isAdult(birthDate) {
+    const birth = new Date(birthDate);
+    const today = new Date();
+
+    if (Number.isNaN(birth.getTime())) {
+        return false;
+    }
+
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDifference = today.getMonth() - birth.getMonth();
+    const dayDifference = today.getDate() - birth.getDate();
+
+    if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+        age--;
+    }
+
+    return age >= 18;
+}
+
 // arma el cuerpo correcto para registrar compradores o vendedores
 async function registerUser(payload) {
     if (payload.role === 'buyer') {
@@ -204,6 +224,11 @@ registerForm.addEventListener('submit', async function (event) {
 
     if (password.trim().length < 6) {
         setMessage(registerMessage, 'La contrasena debe tener al menos 6 caracteres.');
+        return;
+    }
+
+    if (!isAdult(birthDate)) {
+        setMessage(registerMessage, 'Debes ser mayor de 18 años para crear una cuenta.');
         return;
     }
 

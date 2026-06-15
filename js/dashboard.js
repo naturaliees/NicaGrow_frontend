@@ -1,4 +1,5 @@
 const sessionKey = 'nicagrowCurrentUser';
+const productImagesKey = 'nicagrowProductImages';
 
 // datos basicos de sesion y formato
 function getCurrentUser() {
@@ -23,21 +24,85 @@ function escapeHtml(value) {
     return text;
 }
 
+// guarda fotos por producto cuando la api no devuelve la imagen
+function getSavedProductImages() {
+    try {
+        return JSON.parse(localStorage.getItem(productImagesKey)) || {};
+    } catch {
+        return {};
+    }
+}
+
+function saveProductImage(productId, imageData) {
+    if (!productId || !imageData) {
+        return;
+    }
+
+    const images = getSavedProductImages();
+    images[String(productId)] = imageData;
+    localStorage.setItem(productImagesKey, JSON.stringify(images));
+}
+
+function getSavedProductImage(product) {
+    const images = getSavedProductImages();
+    return images[String(product.Id || product.id || '')] || '';
+}
+
+// convierte rutas relativas de django en urls completas para el navegador
+function normalizeImageSource(value) {
+    const image = String(value || '').trim();
+
+    if (!image) {
+        return '';
+    }
+
+    if (image.indexOf('data:image') === 0 || image.indexOf('http') === 0 || image.indexOf('blob:') === 0) {
+        return image;
+    }
+
+    if (image.indexOf('/media/') === 0 || image.indexOf('media/') === 0) {
+        const apiRoot = NicaGrowApi.getBaseUrl().replace(/\/api$/, '');
+        return apiRoot + '/' + image.replace(/^\//, '');
+    }
+
+    if (image.indexOf('/') >= 0 || image.indexOf('.') >= 0) {
+        const apiRoot = NicaGrowApi.getBaseUrl().replace(/\/api$/, '');
+        return apiRoot + '/' + image.replace(/^\//, '');
+    }
+
+    return 'data:image/jpeg;base64,' + image;
+}
+
 // prepara imagenes que vienen como url o como archivo convertido a base64
 function getProductImage(product) {
-    if (product.FotoUrl) {
-        return product.FotoUrl;
+    const imageUrl = product.FotoUrl || product.FotoURL || product.foto_url || product.imagen_url ||
+        product.ImagenUrl || product.FotoProductoUrl || product.Foto || product.foto ||
+        product.Imagen || product.imagen || product.FotoProducto || product.foto_producto ||
+        product.image || product.Image;
+    const imageBase64 = product.FotoBase64 || product.foto_base64 || product.ImagenBase64 ||
+        product.imagen_base64 || product.FotoProductoBase64 || product.foto_producto_base64;
+
+    if (imageUrl) {
+        return normalizeImageSource(imageUrl);
     }
 
-    if (product.FotoBase64) {
-        if (String(product.FotoBase64).indexOf('data:image') === 0) {
-            return product.FotoBase64;
-        }
-
-        return 'data:image/jpeg;base64,' + product.FotoBase64;
+    if (imageBase64) {
+        return normalizeImageSource(imageBase64);
     }
 
-    return '';
+    return getSavedProductImage(product);
+}
+
+// deja solo el texto base64 cuando la api no acepta el prefijo data:image
+function cleanImageBase64(imageData) {
+    const value = String(imageData || '');
+    const commaIndex = value.indexOf(',');
+
+    if (commaIndex >= 0) {
+        return value.slice(commaIndex + 1);
+    }
+
+    return value;
 }
 
 // convierte una imagen del dispositivo en texto para enviarla al backend
@@ -122,6 +187,8 @@ if (!currentUser || currentUser.role !== 'seller') {
     const saleStatusSelect = document.getElementById('saleStatusSelect');
     const saleMessage = document.getElementById('saleMessage');
     const productCategory = document.getElementById('productCategory');
+    const productImageInput = document.getElementById('productImage');
+    const productImagePreview = document.getElementById('productImagePreview');
 
     let editingProductId = null;
     let activeSale = null;
@@ -156,6 +223,16 @@ if (!currentUser || currentUser.role !== 'seller') {
     function setSaleMessage(message, type) {
         saleMessage.textContent = message;
         saleMessage.classList.toggle('error', type === 'error');
+    }
+
+    // muestra la foto actual o la nueva seleccionada en el formulario
+    function renderProductImagePreview(image) {
+        if (image) {
+            productImagePreview.innerHTML = '<img src="' + escapeHtml(image) + '" alt="vista previa del producto">';
+            return;
+        }
+
+        productImagePreview.textContent = 'sin foto';
     }
 
     // busca el nombre visible de una categoria
@@ -358,6 +435,7 @@ if (!currentUser || currentUser.role !== 'seller') {
     function resetProductForm() {
         editingProductId = null;
         productForm.reset();
+        renderProductImagePreview('');
         productFormTitle.textContent = 'Publicar producto';
         productSubmitBtn.textContent = 'Publicar';
         cancelEditBtn.classList.remove('active');
@@ -376,11 +454,11 @@ if (!currentUser || currentUser.role !== 'seller') {
 
         editingProductId = product.Id;
         document.getElementById('productName').value = product.NombreProducto || '';
-        document.getElementById('productDescription').value = product.Descripcion || '';
         document.getElementById('productCategory').value = product.IdCategoria || '';
         document.getElementById('productPrice').value = product.Precio || '';
         document.getElementById('productStock').value = product.Stock || '';
-        document.getElementById('productImage').value = '';
+        productImageInput.value = '';
+        renderProductImagePreview(getProductImage(product));
 
         productFormTitle.textContent = 'Editar producto';
         productSubmitBtn.textContent = 'Guardar cambios';
@@ -488,6 +566,16 @@ if (!currentUser || currentUser.role !== 'seller') {
         setProductMessage('', 'success');
     });
 
+    productImageInput.addEventListener('change', async function () {
+        try {
+            const imageBase64 = await readImageFile(productImageInput.files[0]);
+            renderProductImagePreview(imageBase64);
+        } catch (error) {
+            renderProductImagePreview('');
+            setProductMessage(error.message || 'No se pudo leer la imagen.', 'error');
+        }
+    });
+
     profileButton.addEventListener('click', openProfileModal);
     closeProfileBtn.addEventListener('click', closeProfileModal);
     closeSaleModalBtn.addEventListener('click', function () {
@@ -548,7 +636,6 @@ if (!currentUser || currentUser.role !== 'seller') {
         event.preventDefault();
 
         const productName = document.getElementById('productName').value.trim();
-        const productDescription = document.getElementById('productDescription').value.trim();
         const productPrice = document.getElementById('productPrice').value;
         const productStock = document.getElementById('productStock').value;
         const categoryId = productCategory.value;
@@ -564,27 +651,43 @@ if (!currentUser || currentUser.role !== 'seller') {
             NombreProducto: productName,
             Precio: Number(productPrice),
             Stock: Number(productStock),
-            IdCategoria: categoryId,
-            Descripcion: productDescription
+            IdCategoria: categoryId
         };
 
         try {
             const imageBase64 = await readImageFile(productImageFile);
+            let imageProductId = editingProductId;
 
             if (imageBase64) {
                 payload.FotoBase64 = imageBase64;
+                payload.ImagenBase64 = cleanImageBase64(imageBase64);
             }
 
             if (editingProductId) {
-                await NicaGrowApi.patch('/productos/' + editingProductId + '/', payload);
+                const updatedProduct = await NicaGrowApi.patch('/productos/' + editingProductId + '/', payload);
+                imageProductId = (updatedProduct && (updatedProduct.Id || updatedProduct.id)) || editingProductId;
                 setProductMessage('Producto actualizado correctamente.', 'success');
             } else {
-                await NicaGrowApi.post('/productos/', payload);
+                const createdProduct = await NicaGrowApi.post('/productos/', payload);
+                imageProductId = createdProduct && (createdProduct.Id || createdProduct.id);
                 setProductMessage('Producto publicado correctamente.', 'success');
             }
 
             resetProductForm();
             await loadDashboard();
+
+            if (imageBase64 && !imageProductId) {
+                const foundProduct = productsCache.find(function (item) {
+                    return String(item.NombreProducto) === productName &&
+                        String(item.IdVendedor) === String(currentUser.id) &&
+                        Number(item.Precio) === Number(productPrice);
+                });
+
+                imageProductId = foundProduct && foundProduct.Id;
+            }
+
+            saveProductImage(imageProductId, imageBase64);
+            renderProducts(productsCache);
         } catch (error) {
             setProductMessage(error.message || 'No se pudo guardar el producto.', 'error');
         }

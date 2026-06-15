@@ -1,25 +1,13 @@
 const sessionKey = 'nicagrowCurrentUser';
-const cartKey = 'nicagrowBuyerCart';
+const productImagesKey = 'nicagrowProductImages';
 
-// sesion y datos locales del carrito
+// sesion actual del comprador
 function getCurrentUser() {
     return NicaGrowApi.getSession();
 }
 
 function saveSession(user) {
     localStorage.setItem(sessionKey, JSON.stringify(user));
-}
-
-function getStoredItems(key) {
-    try {
-        return JSON.parse(localStorage.getItem(key)) || [];
-    } catch {
-        return [];
-    }
-}
-
-function saveStoredItems(key, items) {
-    localStorage.setItem(key, JSON.stringify(items));
 }
 
 // formato seguro para textos y precios
@@ -37,21 +25,63 @@ function escapeHtml(value) {
     return text;
 }
 
+// lee fotos guardadas localmente si la api no las regresa todavia
+function getSavedProductImages() {
+    try {
+        return JSON.parse(localStorage.getItem(productImagesKey)) || {};
+    } catch {
+        return {};
+    }
+}
+
+function getSavedProductImage(product) {
+    const images = getSavedProductImages();
+    return images[String(product.Id || product.IdProducto || product.id || '')] || '';
+}
+
+// convierte rutas relativas de django en urls completas para el navegador
+function normalizeImageSource(value) {
+    const image = String(value || '').trim();
+
+    if (!image) {
+        return '';
+    }
+
+    if (image.indexOf('data:image') === 0 || image.indexOf('http') === 0 || image.indexOf('blob:') === 0) {
+        return image;
+    }
+
+    if (image.indexOf('/media/') === 0 || image.indexOf('media/') === 0) {
+        const apiRoot = NicaGrowApi.getBaseUrl().replace(/\/api$/, '');
+        return apiRoot + '/' + image.replace(/^\//, '');
+    }
+
+    if (image.indexOf('/') >= 0 || image.indexOf('.') >= 0) {
+        const apiRoot = NicaGrowApi.getBaseUrl().replace(/\/api$/, '');
+        return apiRoot + '/' + image.replace(/^\//, '');
+    }
+
+    return 'data:image/jpeg;base64,' + image;
+}
+
 // obtiene la imagen del producto, venga como url o base64
 function getProductImage(product) {
-    if (product.FotoUrl) {
-        return product.FotoUrl;
+    const imageUrl = product.FotoUrl || product.FotoURL || product.foto_url || product.imagen_url ||
+        product.ImagenUrl || product.FotoProductoUrl || product.Foto || product.foto ||
+        product.Imagen || product.imagen || product.FotoProducto || product.foto_producto ||
+        product.image || product.Image;
+    const imageBase64 = product.FotoBase64 || product.foto_base64 || product.ImagenBase64 ||
+        product.imagen_base64 || product.FotoProductoBase64 || product.foto_producto_base64;
+
+    if (imageUrl) {
+        return normalizeImageSource(imageUrl);
     }
 
-    if (product.FotoBase64) {
-        if (String(product.FotoBase64).indexOf('data:image') === 0) {
-            return product.FotoBase64;
-        }
-
-        return 'data:image/jpeg;base64,' + product.FotoBase64;
+    if (imageBase64) {
+        return normalizeImageSource(imageBase64);
     }
 
-    return '';
+    return getSavedProductImage(product);
 }
 
 const currentUser = getCurrentUser();
@@ -94,6 +124,7 @@ if (!currentUser || currentUser.role !== 'buyer') {
     let sellersCache = [];
     let categoriesCache = [];
     let purchasesCache = [];
+    let cartCache = [];
     let productsLoadError = '';
 
     // cambia entre inicio y compras realizadas
@@ -145,7 +176,6 @@ if (!currentUser || currentUser.role !== 'buyer') {
         const id = product.Id || product.IdProducto || product.purchaseIndex;
         const name = product.NombreProducto || product.productName;
         const price = product.Precio || product.PrecioUnitario || product.price || 0;
-        const description = product.Descripcion || product.description || categoryName(product.IdCategoria) || 'Producto artesanal nicaraguense.';
         const sellerId = product.IdVendedor;
         const image = getProductImage(product);
         let productMedia = '<div class="seller-product-placeholder buyer-product-placeholder">sin foto</div>';
@@ -160,7 +190,7 @@ if (!currentUser || currentUser.role !== 'buyer') {
         html += productMedia;
         html += '<div class="card-body buyer-product-info d-flex flex-column">';
         html += '<h2 class="card-title">' + escapeHtml(name) + '</h2>';
-        html += '<p class="card-text">' + escapeHtml(description) + '</p>';
+        html += '<p class="card-text">' + escapeHtml(categoryName(product.IdCategoria)) + '</p>';
         html += '<strong class="mt-auto">' + formatCurrency(price) + '</strong>';
         html += '<div class="buyer-card-actions">';
 
@@ -200,36 +230,38 @@ if (!currentUser || currentUser.role !== 'buyer') {
         buyerProductsGrid.innerHTML = html || '<div class="col-12"><p class="buyer-empty">' + escapeHtml(productsLoadError || 'No hay productos publicados.') + '</p></div>';
     }
 
-    // lee solo los productos del carrito del cliente actual
+    // lee solo los productos del carrito del cliente actual desde la tabla Carrito
     function getBuyerCart() {
-        const allCartItems = getStoredItems(cartKey);
         const buyerCartItems = [];
 
-        for (let i = 0; i < allCartItems.length; i++) {
-            if (allCartItems[i].buyerId === currentUser.id) {
-                buyerCartItems.push(allCartItems[i]);
-            }
+        for (let i = 0; i < cartCache.length; i++) {
+            const product = getProductById(cartCache[i].IdProducto) || {};
+
+            buyerCartItems.push({
+                cartId: cartCache[i].Id,
+                buyerId: currentUser.id,
+                product: {
+                    ...product,
+                    Id: cartCache[i].IdProducto,
+                    IdVendedor: cartCache[i].IdVendedor,
+                    NombreProducto: cartCache[i].NombreProducto || product.NombreProducto,
+                    Precio: cartCache[i].Precio,
+                    FotoBase64: cartCache[i].FotoBase64 || product.FotoBase64,
+                    ImagenBase64: cartCache[i].ImagenBase64 || product.ImagenBase64,
+                    Foto: cartCache[i].Foto || product.Foto,
+                    Imagen: cartCache[i].Imagen || product.Imagen,
+                    ImagenUrl: cartCache[i].ImagenUrl || product.ImagenUrl,
+                    FotoProducto: cartCache[i].FotoProducto || product.FotoProducto
+                },
+                quantity: cartCache[i].Cantidad
+            });
         }
 
         return buyerCartItems;
     }
 
-    // guarda el carrito sin mezclarlo con otros clientes
-    function saveBuyerCart(buyerCartItems) {
-        const allCartItems = getStoredItems(cartKey);
-        const nextCartItems = [];
-
-        for (let i = 0; i < allCartItems.length; i++) {
-            if (allCartItems[i].buyerId !== currentUser.id) {
-                nextCartItems.push(allCartItems[i]);
-            }
-        }
-
-        for (let i = 0; i < buyerCartItems.length; i++) {
-            nextCartItems.push(buyerCartItems[i]);
-        }
-
-        saveStoredItems(cartKey, nextCartItems);
+    async function loadCart() {
+        cartCache = await NicaGrowApi.list('/carrito/?cliente=' + currentUser.id);
     }
 
     // mensajes del carrito y del perfil
@@ -273,7 +305,7 @@ if (!currentUser || currentUser.role !== 'buyer') {
             html += '<p>Cantidad: ' + buyerCartItems[i].quantity + '</p>';
             html += '<strong>' + formatCurrency(buyerCartItems[i].product.Precio) + '</strong>';
             html += '</div>';
-            html += '<button type="button" data-remove-cart="' + escapeHtml(buyerCartItems[i].product.Id) + '">Quitar</button>';
+            html += '<button type="button" data-remove-cart="' + escapeHtml(buyerCartItems[i].cartId) + '">Quitar</button>';
             html += '</div>';
         }
 
@@ -283,7 +315,7 @@ if (!currentUser || currentUser.role !== 'buyer') {
     }
 
     // agrega el producto al carrito sin abrir el modal
-    function buyProduct(productId) {
+    async function buyProduct(productId) {
         const product = getProductById(productId);
 
         if (!product) {
@@ -297,33 +329,57 @@ if (!currentUser || currentUser.role !== 'buyer') {
             quantity = 1;
         }
 
-        const buyerCartItems = getBuyerCart();
-        const existing = buyerCartItems.find(function (item) {
-            return String(item.product.Id) === String(productId);
+        const existing = cartCache.find(function (item) {
+            return String(item.IdProducto) === String(productId);
         });
 
-        if (existing) {
-            existing.quantity += quantity;
-        } else {
-            buyerCartItems.push({
-                buyerId: currentUser.id,
-                product: product,
-                quantity: quantity
-            });
-        }
+        try {
+            if (existing) {
+                await NicaGrowApi.patch('/carrito/' + existing.Id + '/', {
+                    IdProducto: product.Id,
+                    IdCliente: currentUser.id,
+                    Cantidad: Number(existing.Cantidad) + quantity
+                });
+            } else {
+                await NicaGrowApi.post('/carrito/', {
+                    IdProducto: product.Id,
+                    IdCliente: currentUser.id,
+                    Cantidad: quantity
+                });
+            }
 
-        saveBuyerCart(buyerCartItems);
-        renderCart();
+            await loadCart();
+            renderCart();
+        } catch (error) {
+            setCheckoutMessage(error.message || 'No se pudo agregar al carrito.', 'error');
+            cartModal.classList.add('active');
+        }
     }
 
     // quita un producto del carrito
-    function removeCartItem(productId) {
-        const buyerCartItems = getBuyerCart().filter(function (item) {
-            return String(item.product.Id) !== String(productId);
-        });
+    async function removeCartItem(cartId) {
+        try {
+            await NicaGrowApi.remove('/carrito/' + cartId + '/');
+            await loadCart();
+            renderCart();
+        } catch (error) {
+            setCheckoutMessage(error.message || 'No se pudo quitar el producto.', 'error');
+        }
+    }
 
-        saveBuyerCart(buyerCartItems);
-        renderCart();
+    async function clearCart() {
+        try {
+            await NicaGrowApi.remove('/carrito/limpiar/?cliente=' + currentUser.id);
+            cartCache = [];
+        } catch {
+            const currentCartItems = getBuyerCart();
+
+            for (let i = 0; i < currentCartItems.length; i++) {
+                await NicaGrowApi.remove('/carrito/' + currentCartItems[i].cartId + '/');
+            }
+
+            cartCache = [];
+        }
     }
 
     // confirma la compra con pago, envio y direccion
@@ -367,7 +423,7 @@ if (!currentUser || currentUser.role !== 'buyer') {
 
             currentUser.address = address;
             saveSession(currentUser);
-            saveBuyerCart([]);
+            await clearCart();
             await loadPurchases();
             renderCart();
             renderPurchases();
@@ -456,7 +512,6 @@ if (!currentUser || currentUser.role !== 'buyer') {
         document.getElementById('buyerProfileAddress').value = currentUser.address || '';
         document.getElementById('buyerProfileName').textContent = (currentUser.firstName || '') + ' ' + (currentUser.lastName || '');
         document.getElementById('buyerProfileEmailText').textContent = currentUser.email || 'correo@nicagrow.com';
-        document.getElementById('buyerProfilePurchases').textContent = purchasesCache.length;
     }
 
     // abre y cierra el perfil del cliente
@@ -567,6 +622,12 @@ if (!currentUser || currentUser.role !== 'buyer') {
             await loadPurchases();
         } catch {
             purchasesCache = [];
+        }
+
+        try {
+            await loadCart();
+        } catch {
+            cartCache = [];
         }
 
         renderProducts();
