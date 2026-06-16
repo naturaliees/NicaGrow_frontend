@@ -1,6 +1,6 @@
 const NicaGrowApi = (function () {
     // rutas y claves que usa el frontend para hablar con django
-    const defaultBaseUrl = 'http://localhost:8000/api';
+    const defaultBaseUrl = 'https://presidential-duck-favorite-three.trycloudflare.com';
     const configKey = 'nicagrowApiUrl';
     const sessionKey = 'nicagrowCurrentUser';
     const tokenKey = 'nicagrowAccessToken';
