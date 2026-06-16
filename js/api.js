@@ -1,6 +1,6 @@
 const NicaGrowApi = (function () {
     // rutas y claves que usa el frontend para hablar con django
-    const defaultBaseUrl = 'https://nicagrow-api.azurewebsites.net/api';
+    const defaultBaseUrl = 'https://nicagrow-api.azurewebsites.net/api/';
     const configKey = 'nicagrowApiUrl';
     const sessionKey = 'nicagrowCurrentUser';
     const tokenKey = 'nicagrowAccessToken';
@@ -94,8 +94,9 @@ const NicaGrowApi = (function () {
     async function request(path, options) {
         const settings = options || {};
         const headers = settings.headers || {};
+        const isFormData = settings.body instanceof FormData;
 
-        if (!headers['Content-Type'] && settings.body) {
+        if (!headers['Content-Type'] && settings.body && !isFormData) {
             headers['Content-Type'] = 'application/json';
         }
 
@@ -147,6 +148,21 @@ const NicaGrowApi = (function () {
         return request(path, {
             method: 'PATCH',
             body: JSON.stringify(body)
+        });
+    }
+
+    // envia formularios con archivos para que django guarde imagenes reales
+    function postForm(path, body) {
+        return request(path, {
+            method: 'POST',
+            body: body
+        });
+    }
+
+    function patchForm(path, body) {
+        return request(path, {
+            method: 'PATCH',
+            body: body
         });
     }
 
@@ -240,6 +256,8 @@ const NicaGrowApi = (function () {
         request: request,
         post: post,
         patch: patch,
+        postForm: postForm,
+        patchForm: patchForm,
         remove: remove,
         list: list,
         ensureCiudad: ensureCiudad,

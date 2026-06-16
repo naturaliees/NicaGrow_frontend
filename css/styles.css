@@ -2047,7 +2047,7 @@ header .fa-bars{
     gap:12px;
 }
 
-/* iconos de carrito, notificaciones y perfil */
+/* iconos de carrito y perfil */
 .buyer-icon-btn,
 .buyer-cart-btn{
     width:42px;
@@ -2121,6 +2121,28 @@ header .fa-bars{
 .buyer-product-info p{
     color:#717480;
     font-size:13px;
+}
+
+.buyer-toast{
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    z-index:3000;
+    background:var(--negro);
+    color:#fff;
+    padding:14px 22px;
+    border-radius:999px;
+    font-size:15px;
+    font-weight:800;
+    box-shadow:0 12px 28px rgba(25,25,29,.22);
+    opacity:0;
+    transform:translateY(12px);
+    pointer-events:none;
+}
+
+.buyer-toast.show{
+    opacity:1;
+    transform:translateY(0);
 }
 
 .buyer-card-actions{

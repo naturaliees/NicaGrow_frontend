@@ -1,5 +1,4 @@
 const sessionKey = 'nicagrowCurrentUser';
-const productImagesKey = 'nicagrowProductImages';
 
 // datos basicos de sesion y formato
 function getCurrentUser() {
@@ -22,30 +21,6 @@ function escapeHtml(value) {
     text = text.split('"').join('&quot;');
     text = text.split("'").join('&#039;');
     return text;
-}
-
-// guarda fotos por producto cuando la api no devuelve la imagen
-function getSavedProductImages() {
-    try {
-        return JSON.parse(localStorage.getItem(productImagesKey)) || {};
-    } catch {
-        return {};
-    }
-}
-
-function saveProductImage(productId, imageData) {
-    if (!productId || !imageData) {
-        return;
-    }
-
-    const images = getSavedProductImages();
-    images[String(productId)] = imageData;
-    localStorage.setItem(productImagesKey, JSON.stringify(images));
-}
-
-function getSavedProductImage(product) {
-    const images = getSavedProductImages();
-    return images[String(product.Id || product.id || '')] || '';
 }
 
 // convierte rutas relativas de django en urls completas para el navegador
@@ -90,10 +65,10 @@ function getProductImage(product) {
         return normalizeImageSource(imageBase64);
     }
 
-    return getSavedProductImage(product);
+    return '';
 }
 
-// deja solo el texto base64 cuando la api no acepta el prefijo data:image
+// deja solo el texto base64 cuando la api guarda la imagen en una columna
 function cleanImageBase64(imageData) {
     const value = String(imageData || '');
     const commaIndex = value.indexOf(',');
@@ -233,6 +208,64 @@ if (!currentUser || currentUser.role !== 'seller') {
         }
 
         productImagePreview.textContent = 'sin foto';
+    }
+
+    // arma el formulario que se manda a django con la foto real del producto
+    function buildProductFormData(file) {
+        const formData = new FormData();
+
+        formData.append('IdVendedor', currentUser.id);
+        formData.append('NombreProducto', document.getElementById('productName').value.trim());
+        formData.append('Precio', document.getElementById('productPrice').value);
+        formData.append('Stock', document.getElementById('productStock').value);
+        formData.append('IdCategoria', productCategory.value);
+
+        if (file) {
+            formData.append('Foto', file);
+        }
+
+        return formData;
+    }
+
+    // segundo formato por si la api guarda la foto como base64 en la bd
+    async function buildProductJsonPayload(file) {
+        const payload = {
+            IdVendedor: currentUser.id,
+            NombreProducto: document.getElementById('productName').value.trim(),
+            Precio: Number(document.getElementById('productPrice').value),
+            Stock: Number(document.getElementById('productStock').value),
+            IdCategoria: productCategory.value
+        };
+
+        const imageBase64 = await readImageFile(file);
+
+        if (imageBase64) {
+            payload.FotoBase64 = imageBase64;
+            payload.ImagenBase64 = cleanImageBase64(imageBase64);
+        }
+
+        return payload;
+    }
+
+    // intenta guardar primero archivo real, luego base64 si el backend lo pide asi
+    async function saveProductToApi(productId, file) {
+        try {
+            const formData = buildProductFormData(file);
+
+            if (productId) {
+                return await NicaGrowApi.patchForm('/productos/' + productId + '/', formData);
+            }
+
+            return await NicaGrowApi.postForm('/productos/', formData);
+        } catch (formError) {
+            const jsonPayload = await buildProductJsonPayload(file);
+
+            if (productId) {
+                return await NicaGrowApi.patch('/productos/' + productId + '/', jsonPayload);
+            }
+
+            return await NicaGrowApi.post('/productos/', jsonPayload);
+        }
     }
 
     // busca el nombre visible de una categoria
@@ -646,48 +679,17 @@ if (!currentUser || currentUser.role !== 'seller') {
             return;
         }
 
-        const payload = {
-            IdVendedor: currentUser.id,
-            NombreProducto: productName,
-            Precio: Number(productPrice),
-            Stock: Number(productStock),
-            IdCategoria: categoryId
-        };
-
         try {
-            const imageBase64 = await readImageFile(productImageFile);
-            let imageProductId = editingProductId;
-
-            if (imageBase64) {
-                payload.FotoBase64 = imageBase64;
-                payload.ImagenBase64 = cleanImageBase64(imageBase64);
-            }
-
             if (editingProductId) {
-                const updatedProduct = await NicaGrowApi.patch('/productos/' + editingProductId + '/', payload);
-                imageProductId = (updatedProduct && (updatedProduct.Id || updatedProduct.id)) || editingProductId;
+                await saveProductToApi(editingProductId, productImageFile);
                 setProductMessage('Producto actualizado correctamente.', 'success');
             } else {
-                const createdProduct = await NicaGrowApi.post('/productos/', payload);
-                imageProductId = createdProduct && (createdProduct.Id || createdProduct.id);
+                await saveProductToApi('', productImageFile);
                 setProductMessage('Producto publicado correctamente.', 'success');
             }
 
             resetProductForm();
             await loadDashboard();
-
-            if (imageBase64 && !imageProductId) {
-                const foundProduct = productsCache.find(function (item) {
-                    return String(item.NombreProducto) === productName &&
-                        String(item.IdVendedor) === String(currentUser.id) &&
-                        Number(item.Precio) === Number(productPrice);
-                });
-
-                imageProductId = foundProduct && foundProduct.Id;
-            }
-
-            saveProductImage(imageProductId, imageBase64);
-            renderProducts(productsCache);
         } catch (error) {
             setProductMessage(error.message || 'No se pudo guardar el producto.', 'error');
         }

@@ -1,5 +1,4 @@
 const sessionKey = 'nicagrowCurrentUser';
-const productImagesKey = 'nicagrowProductImages';
 const buyerInvoicesKey = 'nicagrowBuyerInvoices';
 
 // sesion actual del comprador
@@ -60,6 +59,32 @@ function saveBuyerInvoices(invoices) {
     localStorage.setItem(buyerInvoicesKey, JSON.stringify(invoices));
 }
 
+// muestra una confirmacion breve sin abrir la factura automaticamente
+function showBuyerNotice(message) {
+    const oldNotice = document.querySelector('.buyer-toast');
+
+    if (oldNotice) {
+        oldNotice.remove();
+    }
+
+    const notice = document.createElement('div');
+    notice.className = 'buyer-toast';
+    notice.textContent = message;
+    document.body.appendChild(notice);
+
+    setTimeout(function () {
+        notice.classList.add('show');
+    }, 10);
+
+    setTimeout(function () {
+        notice.classList.remove('show');
+
+        setTimeout(function () {
+            notice.remove();
+        }, 250);
+    }, 2600);
+}
+
 function saveCheckoutInvoices(pedidoId, items, paymentMethod, shippingMethod, address) {
     const invoices = getSavedBuyerInvoices();
 
@@ -89,20 +114,6 @@ function saveCheckoutInvoices(pedidoId, items, paymentMethod, shippingMethod, ad
     }
 
     saveBuyerInvoices(invoices);
-}
-
-// lee fotos guardadas localmente si la api no las regresa todavia
-function getSavedProductImages() {
-    try {
-        return JSON.parse(localStorage.getItem(productImagesKey)) || {};
-    } catch {
-        return {};
-    }
-}
-
-function getSavedProductImage(product) {
-    const images = getSavedProductImages();
-    return images[String(product.Id || product.IdProducto || product.id || '')] || '';
 }
 
 // convierte rutas relativas de django en urls completas para el navegador
@@ -147,7 +158,7 @@ function getProductImage(product) {
         return normalizeImageSource(imageBase64);
     }
 
-    return getSavedProductImage(product);
+    return '';
 }
 
 const currentUser = getCurrentUser();
@@ -237,6 +248,20 @@ if (!currentUser || currentUser.role !== 'buyer') {
         });
     }
 
+    // intenta encontrar el vendedor de una compra aunque el reporte no traiga id
+    function getPurchaseSellerId(purchase) {
+        if (purchase.IdVendedor) {
+            return purchase.IdVendedor;
+        }
+
+        const product = productsCache.find(function (item) {
+            return String(item.Id) === String(purchase.IdProducto) ||
+                String(item.NombreProducto).toLowerCase() === String(purchase.NombreProducto).toLowerCase();
+        });
+
+        return product ? product.IdVendedor : '';
+    }
+
     // arma una tarjeta para productos o compras
     function buildProductCard(product, isPurchase) {
         const id = product.Id || product.IdProducto || product.purchaseIndex;
@@ -270,7 +295,9 @@ if (!currentUser || currentUser.role !== 'buyer') {
             html += '<button type="button" class="btn" data-buy-product="' + escapeHtml(id) + '">Agregar al carrito</button>';
         }
 
-        html += '<button type="button" class="btn" data-view-seller="' + escapeHtml(sellerId) + '">Ver vendedor</button>';
+        if (sellerId) {
+            html += '<button type="button" class="btn" data-view-seller="' + escapeHtml(sellerId) + '">Ver vendedor</button>';
+        }
         html += '</div>';
         html += '</div>';
         html += '</article>';
@@ -309,9 +336,9 @@ if (!currentUser || currentUser.role !== 'buyer') {
                 product: {
                     ...product,
                     Id: cartCache[i].IdProducto,
-                    IdVendedor: cartCache[i].IdVendedor,
+                    IdVendedor: cartCache[i].IdVendedor || product.IdVendedor,
                     NombreProducto: cartCache[i].NombreProducto || product.NombreProducto,
-                    Precio: cartCache[i].Precio,
+                    Precio: cartCache[i].Precio || product.Precio,
                     FotoBase64: cartCache[i].FotoBase64 || product.FotoBase64,
                     ImagenBase64: cartCache[i].ImagenBase64 || product.ImagenBase64,
                     Foto: cartCache[i].Foto || product.Foto,
@@ -476,7 +503,8 @@ if (!currentUser || currentUser.role !== 'buyer') {
                 IdCliente: currentUser.id,
                 IdMetodoPago: metodoPago.Id,
                 IdMetodoEnvio: metodoEnvio.Id,
-                IdEstado: estado.Id
+                IdEstado: estado.Id,
+                Direccion: address
             });
             const pedidoId = getApiId(pedido);
 
@@ -500,7 +528,8 @@ if (!currentUser || currentUser.role !== 'buyer') {
             renderPurchases();
             setBuyerView('purchases');
             fillCheckoutForm();
-            setCheckoutMessage('Compra realizada con éxito.', 'success');
+            cartModal.classList.remove('active');
+            showBuyerNotice('Compra realizada con éxito.');
         } catch (error) {
             setCheckoutMessage(error.message || 'No se pudo finalizar la compra.', 'error');
         } finally {
@@ -538,7 +567,7 @@ if (!currentUser || currentUser.role !== 'buyer') {
             html += buildProductCard({
                 ...purchasesCache[i],
                 Id: purchasesCache[i].IdPedido,
-                IdVendedor: '',
+                IdVendedor: getPurchaseSellerId(purchasesCache[i]),
                 productName: purchasesCache[i].NombreProducto,
                 price: purchasesCache[i].PrecioUnitario,
                 purchaseIndex: i
