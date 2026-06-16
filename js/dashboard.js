@@ -15,7 +15,7 @@ function formatCurrency(value) {
 }
 
 function escapeHtml(value) {
-    let text = String(value || '');
+    let text = String(value === null || value === undefined ? '' : value);
     text = text.split('&').join('&amp;');
     text = text.split('<').join('&lt;');
     text = text.split('>').join('&gt;');

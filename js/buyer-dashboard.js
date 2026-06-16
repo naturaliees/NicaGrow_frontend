@@ -1,5 +1,6 @@
 const sessionKey = 'nicagrowCurrentUser';
 const productImagesKey = 'nicagrowProductImages';
+const buyerInvoicesKey = 'nicagrowBuyerInvoices';
 
 // sesion actual del comprador
 function getCurrentUser() {
@@ -16,13 +17,78 @@ function formatCurrency(value) {
 }
 
 function escapeHtml(value) {
-    let text = String(value || '');
+    let text = String(value === null || value === undefined ? '' : value);
     text = text.split('&').join('&amp;');
     text = text.split('<').join('&lt;');
     text = text.split('>').join('&gt;');
     text = text.split('"').join('&quot;');
     text = text.split("'").join('&#039;');
     return text;
+}
+
+// obtiene el id aunque la api lo regrese con otro nombre
+function getApiId(item) {
+    if (!item) {
+        return '';
+    }
+
+    if (item.Id || item.id || item.IdPedido || item.idPedido) {
+        return item.Id || item.id || item.IdPedido || item.idPedido;
+    }
+
+    if (item.pedido) {
+        return item.pedido.Id || item.pedido.id || item.pedido.IdPedido || item.pedido.idPedido;
+    }
+
+    if (item.data) {
+        return item.data.Id || item.data.id || item.data.IdPedido || item.data.idPedido;
+    }
+
+    return '';
+}
+
+// guarda facturas locales para mostrar exactamente lo comprado
+function getSavedBuyerInvoices() {
+    try {
+        return JSON.parse(localStorage.getItem(buyerInvoicesKey)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveBuyerInvoices(invoices) {
+    localStorage.setItem(buyerInvoicesKey, JSON.stringify(invoices));
+}
+
+function saveCheckoutInvoices(pedidoId, items, paymentMethod, shippingMethod, address) {
+    const invoices = getSavedBuyerInvoices();
+
+    for (let i = 0; i < items.length; i++) {
+        invoices.push({
+            localInvoice: true,
+            IdPedido: pedidoId,
+            IdProducto: items[i].product.Id,
+            IdVendedor: items[i].product.IdVendedor,
+            ClienteId: currentUser.id,
+            Cliente: (currentUser.firstName + ' ' + currentUser.lastName).trim(),
+            NombreProducto: items[i].product.NombreProducto,
+            PrecioUnitario: Number(items[i].product.Precio || 0),
+            Cantidad: items[i].quantity,
+            Subtotal: Number(items[i].product.Precio || 0) * items[i].quantity,
+            MetodoPago: paymentMethod,
+            MetodoEnvio: shippingMethod,
+            Direccion: address,
+            Estado: 'pendiente',
+            FotoBase64: items[i].product.FotoBase64,
+            ImagenBase64: items[i].product.ImagenBase64,
+            Foto: items[i].product.Foto,
+            Imagen: items[i].product.Imagen,
+            ImagenUrl: items[i].product.ImagenUrl,
+            FotoProducto: items[i].product.FotoProducto
+        });
+    }
+
+    saveBuyerInvoices(invoices);
 }
 
 // lee fotos guardadas localmente si la api no las regresa todavia
@@ -410,17 +476,22 @@ if (!currentUser || currentUser.role !== 'buyer') {
                 IdCliente: currentUser.id,
                 IdMetodoPago: metodoPago.Id,
                 IdMetodoEnvio: metodoEnvio.Id,
-                IdEstado: estado.Id,
-                Direccion: address
+                IdEstado: estado.Id
             });
+            const pedidoId = getApiId(pedido);
+
+            if (!pedidoId) {
+                throw new Error('La API creo el pedido, pero no regreso el id del pedido.');
+            }
 
             for (let i = 0; i < buyerCartItems.length; i++) {
-                await NicaGrowApi.post('/pedidos/' + pedido.Id + '/agregar_producto/', {
+                await NicaGrowApi.post('/pedidos/' + pedidoId + '/agregar_producto/', {
                     IdProducto: buyerCartItems[i].product.Id,
                     Cantidad: buyerCartItems[i].quantity
                 });
             }
 
+            saveCheckoutInvoices(pedidoId, buyerCartItems, paymentMethod, shippingMethod, address);
             currentUser.address = address;
             saveSession(currentUser);
             await clearCart();
@@ -428,12 +499,8 @@ if (!currentUser || currentUser.role !== 'buyer') {
             renderCart();
             renderPurchases();
             setBuyerView('purchases');
-            cartModal.classList.remove('active');
             fillCheckoutForm();
-
-            if (purchasesCache.length > 0) {
-                openPurchaseDetail(purchasesCache.length - 1);
-            }
+            setCheckoutMessage('Compra realizada con éxito.', 'success');
         } catch (error) {
             setCheckoutMessage(error.message || 'No se pudo finalizar la compra.', 'error');
         } finally {
@@ -445,10 +512,22 @@ if (!currentUser || currentUser.role !== 'buyer') {
     // carga el historial de compras del cliente
     async function loadPurchases() {
         const currentName = (currentUser.firstName + ' ' + currentUser.lastName).trim().toLowerCase();
+        const savedInvoices = getSavedBuyerInvoices().filter(function (purchase) {
+            return String(purchase.ClienteId) === String(currentUser.id);
+        });
         const reports = await NicaGrowApi.list('/reportes/detalle-pedidos/');
-        purchasesCache = reports.filter(function (purchase) {
+        const apiPurchases = reports.filter(function (purchase) {
             return String(purchase.Cliente).toLowerCase() === currentName;
         });
+        const savedKeys = savedInvoices.map(function (purchase) {
+            return String(purchase.IdPedido) + '-' + String(purchase.IdProducto || purchase.NombreProducto);
+        });
+        const missingApiPurchases = apiPurchases.filter(function (purchase) {
+            const key = String(purchase.IdPedido) + '-' + String(purchase.IdProducto || purchase.NombreProducto);
+            return savedKeys.indexOf(key) === -1;
+        });
+
+        purchasesCache = savedInvoices.concat(missingApiPurchases);
     }
 
     // muestra las compras realizadas como tarjetas
