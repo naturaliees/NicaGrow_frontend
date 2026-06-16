@@ -2516,9 +2516,15 @@ header .fa-bars{
         width:100%;
     }
 
+    .buyer-category-filter{
+        margin-top:8px;
+    }
+
     .buyer-top-icons{
         justify-content:flex-start;
         flex-wrap:wrap;
+        gap:14px;
+        margin-top:8px;
     }
 
     .buyer-card-actions{

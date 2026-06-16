@@ -25,6 +25,30 @@ function escapeHtml(value) {
     return text;
 }
 
+// detecta imagenes guardadas como texto base64 en la base de datos
+function isBase64Image(value) {
+    const image = String(value || '').replace(/\s/g, '');
+    return image.length > 40 && /^[A-Za-z0-9+/=]+$/.test(image);
+}
+
+function getBase64Mime(value) {
+    const image = String(value || '').replace(/\s/g, '');
+
+    if (image.indexOf('iVBOR') === 0) {
+        return 'image/png';
+    }
+
+    if (image.indexOf('R0lG') === 0) {
+        return 'image/gif';
+    }
+
+    if (image.indexOf('UklGR') === 0) {
+        return 'image/webp';
+    }
+
+    return 'image/jpeg';
+}
+
 // obtiene el id aunque la api lo regrese con otro nombre
 function getApiId(item) {
     if (!item) {
@@ -119,6 +143,7 @@ function saveCheckoutInvoices(pedidoId, items, paymentMethod, shippingMethod, ad
 // convierte rutas relativas de django en urls completas para el navegador
 function normalizeImageSource(value) {
     const image = String(value || '').trim();
+    const cleanImage = image.replace(/\s/g, '');
 
     if (!image) {
         return '';
@@ -126,6 +151,10 @@ function normalizeImageSource(value) {
 
     if (image.indexOf('data:image') === 0 || image.indexOf('http') === 0 || image.indexOf('blob:') === 0) {
         return image;
+    }
+
+    if (isBase64Image(image)) {
+        return 'data:' + getBase64Mime(image) + ';base64,' + cleanImage;
     }
 
     if (image.indexOf('/media/') === 0 || image.indexOf('media/') === 0) {

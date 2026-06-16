@@ -23,9 +23,34 @@ function escapeHtml(value) {
     return text;
 }
 
+// detecta imagenes guardadas como texto base64 en la base de datos
+function isBase64Image(value) {
+    const image = String(value || '').replace(/\s/g, '');
+    return image.length > 40 && /^[A-Za-z0-9+/=]+$/.test(image);
+}
+
+function getBase64Mime(value) {
+    const image = String(value || '').replace(/\s/g, '');
+
+    if (image.indexOf('iVBOR') === 0) {
+        return 'image/png';
+    }
+
+    if (image.indexOf('R0lG') === 0) {
+        return 'image/gif';
+    }
+
+    if (image.indexOf('UklGR') === 0) {
+        return 'image/webp';
+    }
+
+    return 'image/jpeg';
+}
+
 // convierte rutas relativas de django en urls completas para el navegador
 function normalizeImageSource(value) {
     const image = String(value || '').trim();
+    const cleanImage = image.replace(/\s/g, '');
 
     if (!image) {
         return '';
@@ -33,6 +58,10 @@ function normalizeImageSource(value) {
 
     if (image.indexOf('data:image') === 0 || image.indexOf('http') === 0 || image.indexOf('blob:') === 0) {
         return image;
+    }
+
+    if (isBase64Image(image)) {
+        return 'data:' + getBase64Mime(image) + ';base64,' + cleanImage;
     }
 
     if (image.indexOf('/media/') === 0 || image.indexOf('media/') === 0) {
@@ -210,24 +239,7 @@ if (!currentUser || currentUser.role !== 'seller') {
         productImagePreview.textContent = 'sin foto';
     }
 
-    // arma el formulario que se manda a django con la foto real del producto
-    function buildProductFormData(file) {
-        const formData = new FormData();
-
-        formData.append('IdVendedor', currentUser.id);
-        formData.append('NombreProducto', document.getElementById('productName').value.trim());
-        formData.append('Precio', document.getElementById('productPrice').value);
-        formData.append('Stock', document.getElementById('productStock').value);
-        formData.append('IdCategoria', productCategory.value);
-
-        if (file) {
-            formData.append('Foto', file);
-        }
-
-        return formData;
-    }
-
-    // segundo formato por si la api guarda la foto como base64 en la bd
+    // arma el formato que la api espera para guardar la foto en la base de datos
     async function buildProductJsonPayload(file) {
         const payload = {
             IdVendedor: currentUser.id,
@@ -240,32 +252,21 @@ if (!currentUser || currentUser.role !== 'seller') {
         const imageBase64 = await readImageFile(file);
 
         if (imageBase64) {
-            payload.FotoBase64 = imageBase64;
-            payload.ImagenBase64 = cleanImageBase64(imageBase64);
+            payload.Foto = imageBase64;
         }
 
         return payload;
     }
 
-    // intenta guardar primero archivo real, luego base64 si el backend lo pide asi
+    // guarda productos usando el campo foto en base64 que entiende django
     async function saveProductToApi(productId, file) {
-        try {
-            const formData = buildProductFormData(file);
+        const jsonPayload = await buildProductJsonPayload(file);
 
-            if (productId) {
-                return await NicaGrowApi.patchForm('/productos/' + productId + '/', formData);
-            }
-
-            return await NicaGrowApi.postForm('/productos/', formData);
-        } catch (formError) {
-            const jsonPayload = await buildProductJsonPayload(file);
-
-            if (productId) {
-                return await NicaGrowApi.patch('/productos/' + productId + '/', jsonPayload);
-            }
-
-            return await NicaGrowApi.post('/productos/', jsonPayload);
+        if (productId) {
+            return await NicaGrowApi.patch('/productos/' + productId + '/', jsonPayload);
         }
+
+        return await NicaGrowApi.post('/productos/', jsonPayload);
     }
 
     // busca el nombre visible de una categoria
