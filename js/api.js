@@ -1,6 +1,6 @@
 const NicaGrowApi = (function () {
     // rutas y claves que usa el frontend para hablar con django
-    const defaultBaseUrl = 'https://nicagrow-api.azurewebsites.net';
+    const defaultBaseUrl = 'https://nicagrow-api.azurewebsites.net/api';
     const configKey = 'nicagrowApiUrl';
     const sessionKey = 'nicagrowCurrentUser';
     const tokenKey = 'nicagrowAccessToken';
