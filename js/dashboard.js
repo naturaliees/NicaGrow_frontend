@@ -199,6 +199,7 @@ if (!currentUser || currentUser.role !== 'seller') {
     let categories = [];
     let productsCache = [];
     let salesCache = [];
+    let clientsCache = [];
 
     sellerSessionName.textContent = currentUser.firstName + ' ' + currentUser.lastName;
 
@@ -276,6 +277,60 @@ if (!currentUser || currentUser.role !== 'seller') {
         });
 
         return category ? category.Categoria : 'Sin categoria';
+    }
+
+    // limpia textos para comparar nombres que vienen desde reportes
+    function normalizeText(value) {
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    // busca el cliente de una venta para completar contacto
+    function findClientForSale(sale) {
+        const saleClientName = normalizeText(sale.Cliente);
+
+        return clientsCache.find(function (client) {
+            const clientName = normalizeText((client.Nombre || '') + ' ' + (client.Apellidos || ''));
+
+            return String(client.Id) === String(sale.IdCliente || sale.ClienteId || '') ||
+                clientName === saleClientName;
+        });
+    }
+
+    // busca direccion si viene del reporte o de una compra hecha en este navegador
+    function findSaleAddress(sale) {
+        const directAddress = sale.Direccion || sale.DireccionEnvio || sale.DireccionEntrega || sale.DireccionCliente;
+
+        if (directAddress) {
+            return directAddress;
+        }
+
+        try {
+            const invoices = JSON.parse(localStorage.getItem('nicagrowBuyerInvoices')) || [];
+            const invoice = invoices.find(function (item) {
+                return String(item.IdPedido) === String(sale.IdPedido) &&
+                    normalizeText(item.NombreProducto) === normalizeText(sale.NombreProducto);
+            });
+
+            return invoice ? invoice.Direccion : '';
+        } catch {
+            return '';
+        }
+    }
+
+    // agrega correo, telefono y direccion cuando el reporte no los trae
+    function enrichSaleWithClientInfo(sale) {
+        const client = findClientForSale(sale) || {};
+
+        return {
+            ...sale,
+            ClienteCorreo: sale.ClienteCorreo || sale.CorreoCliente || client.Correo || '',
+            ClienteTelefono: sale.ClienteTelefono || sale.TelefonoCliente || client.Telefono || '',
+            Direccion: findSaleAddress(sale)
+        };
     }
 
     // carga las categorias necesarias para publicar productos
@@ -453,9 +508,18 @@ if (!currentUser || currentUser.role !== 'seller') {
     // trae productos y ventas desde la api
     async function loadDashboard() {
         productsCache = await NicaGrowApi.list('/productos/?vendedor=' + currentUser.id);
+
+        try {
+            clientsCache = await NicaGrowApi.list('/clientes/');
+        } catch {
+            clientsCache = [];
+        }
+
         const allSales = await NicaGrowApi.list('/reportes/detalle-pedidos/');
         salesCache = allSales.filter(function (sale) {
             return String(sale.Vendedor).toLowerCase() === String(currentUser.businessName).toLowerCase();
+        }).map(function (sale) {
+            return enrichSaleWithClientInfo(sale);
         });
 
         renderProducts(productsCache);
